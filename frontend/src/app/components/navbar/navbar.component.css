@@ -1,0 +1,14 @@
+nav {
+    width: 100vw;
+    height: 5vh;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    background-color: #181a1b;
+}
+
+.nav-item {
+    margin: 0.75em;
+    cursor: pointer;
+}
