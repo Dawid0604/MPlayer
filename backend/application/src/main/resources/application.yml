@@ -1,0 +1,42 @@
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  application:
+    name: "MPlayer"
+
+  datasource:
+    url: jdbc:mariadb://${DATABASE_URL:localhost:3306}/mplayer_db
+    username: ${DATABASE_USERNAME:fedora}
+    password: ${DATABASE_PASSWORD:fedora}
+    driver-class-name: org.mariadb.jdbc.Driver
+    hikari:
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        cacheServerConfiguration: true
+        cacheResultSetMetadata: true
+        cacheCallableStmts: true
+        elideSetAutoCommits: true
+        useCompression: true
+        tcpKeepAlive: true
+        useLocalSessionState: true
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+  flyway:
+    schemas: mplayer_db
+    url: jdbc:mariadb://${DATABASE_URL:localhost:3306}/mplayer_db
+    user: ${DATABASE_USERNAME:fedora}
+    password: ${DATABASE_PASSWORD:fedora}
+
+custom:
+  security:
+    aes:
+      secretKey: =f7;Qd[622#9P+ZGIlDqw&sIKwK~P(QR
