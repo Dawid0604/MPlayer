@@ -1,5 +1,4 @@
-spring:
-  logging:
+logging:
     level:
       org:
         hibernate:

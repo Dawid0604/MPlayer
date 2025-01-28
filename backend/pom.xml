@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.1</version>
+		<version>3.3.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -20,7 +20,8 @@
 		<module>service-dao-impl</module>
 		<module>service-rest</module>
 		<module>service-rest-impl</module>
-	</modules>
+        <module>dto</module>
+    </modules>
 
 	<packaging>pom</packaging>
 	<modelVersion>4.0.0</modelVersion>

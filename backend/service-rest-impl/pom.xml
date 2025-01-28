@@ -15,13 +15,19 @@
     <dependencies>
         <dependency>
             <groupId>pl.dawid0604.mplayer</groupId>
-            <artifactId>repository</artifactId>
+            <artifactId>service-rest</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>pl.dawid0604.mplayer</groupId>
-            <artifactId>service-rest</artifactId>
+            <artifactId>service-dao</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>pl.dawid0604.mplayer</groupId>
+            <artifactId>utils</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

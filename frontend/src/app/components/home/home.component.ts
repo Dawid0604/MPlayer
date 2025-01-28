@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { faCirclePlay, faCircleStop, faClock, faEyeSlash, faVolumeHigh, faVolumeLow, faVolumeOff } from '@fortawesome/free-solid-svg-icons';
+import { SongService } from '../../services/song.service';
+import { SongDTO, WelcomeSongsDTO } from '../../model/WelcomeSongsDTO';
 
 @Component({
   selector: 'app-home',
@@ -8,7 +10,7 @@ import { faCirclePlay, faCircleStop, faClock, faEyeSlash, faVolumeHigh, faVolume
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   playIcon = faCirclePlay;
   hidePlayerBarIcon = faEyeSlash;
   stopIcon = faCircleStop;
@@ -20,7 +22,40 @@ export class HomeComponent {
   isPlaying = false;
   currentTime = 0;
   volume = 1;
-  currentTrack = { url: 'https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/000/936/royalty-1619082033-7RC2AlRdd1.mp3', title: 'Alan Walker - Fade', img: 'https://linkstorage.linkfire.com/medialinks/images/374fc4ba-fe39-4bcf-9cf0-74c87c879ed0/artwork-440x440.jpg' };
+
+  welcomeSongs: WelcomeSongsDTO = { } as WelcomeSongsDTO;
+  currentSong : SongDTO = { } as SongDTO;
+
+  constructor(private songService: SongService) { }
+
+  ngOnInit(): void {
+    this.songService
+        .findWelcomeSongs()
+        .subscribe({
+          next: _res => this.welcomeSongs = _res,
+          error: _err => console.log(_err)
+        })
+  }
+
+  selectSong(song: SongDTO, audioElement: HTMLAudioElement) {
+    this.currentSong = song;
+    this.showPlayerBar = true;
+    this.isPlaying = false;
+    this.currentTime = 0;
+    this.volume = 1;    
+    audioElement.load();
+  }
+
+  hidePlayer(audioElement: HTMLAudioElement) {
+    this.currentSong = { } as SongDTO;
+    this.showPlayerBar = false;
+    this.isPlaying = false;
+    this.currentTime = 0;
+    this.volume = 1;
+    
+    audioElement.pause();    
+    audioElement.currentTime = 0;
+  }
 
   togglePlayPause(audioElement: HTMLAudioElement) {    
     if (this.isPlaying) {
@@ -32,6 +67,11 @@ export class HomeComponent {
         }
 
         audioElement.play();
+        this.songService.handleSongListening(this.currentSong.encryptedId)
+                        .subscribe({
+                          next: _res => { },
+                          error: _err => console.log(_err)
+                        })
     }
     
     this.isPlaying = !this.isPlaying;

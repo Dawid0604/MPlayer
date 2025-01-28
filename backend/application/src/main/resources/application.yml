@@ -36,6 +36,9 @@ spring:
     user: ${DATABASE_USERNAME:fedora}
     password: ${DATABASE_PASSWORD:fedora}
 
+  session:
+    timeout: 30m
+
 custom:
   security:
     aes:

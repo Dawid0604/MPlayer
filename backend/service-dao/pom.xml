@@ -11,4 +11,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>pl.dawid0604.mplayer</groupId>
     <artifactId>service-dao</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>pl.dawid0604.mplayer</groupId>
+            <artifactId>entity</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>

@@ -1,88 +1,22 @@
 <main>
+    <audio #audioPlayer (timeupdate)="onTimeUpdate(audioPlayer)" controls>            
+        <source [src]="currentSong.soundLink" type="audio/mp3">    
+    </audio>
+
     <section id="popular_box">     
         <header class="box_header">
             <h3>Popular songs</h3>            
         </header>
 
         <article class="songs_list">
-            <article class="song_box" (click)="showPlayerBar = true">
-                <div class="song_image_box" style="background-image: url(https://linkstorage.linkfire.com/medialinks/images/85803633-60c7-45b2-9819-239964911c37/artwork-440x440.jpg);"></div>
+            <article *ngFor="let song of welcomeSongs.popular" class="song_box" (click)="selectSong(song, audioPlayer)">
+                <div class="song_image_box"  [style]="{ 'background-image': 'url(' + song.thumbnailPath + ')'}"></div>
     
                 <div class="song_data_box">
                     <div>
-                        <strong>Link<p style="font-size: small;">Jim Yosef</p></strong> 
+                        <strong>{{song.title}}<p style="font-size: small;">{{song.authors.join(', ')}}</p></strong> 
                     </div>
     
-                    <div class="song_play_action">
-                        <fa-icon [icon]="playIcon"></fa-icon>
-                    </div>
-                </div>
-            </article>
-    
-            <article class="song_box">
-                <div class="song_image_box" style="background-image: url(https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/000/936/325x325/royalty-1619082030-xBgqGZWLw9.jpg);"></div>
-    
-                <div class="song_data_box">                                        
-                    <div>
-                        <strong>Royalty<p style="font-size: small;">Maestro Chives, Egzod, Neoni</p></strong>                        
-                    </div>
-
-                    <div class="song_play_action">
-                        <fa-icon [icon]="playIcon"></fa-icon>
-                    </div>
-                </div>
-            </article>
-    
-            <article class="song_box">
-                <div class="song_image_box" style="background-image: url(https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/000/172/1000x0/arrow-1586947152-LUmQRKQIRc.jpg);"></div>
-    
-                <div class="song_data_box">                                        
-                    <div>
-                        <strong>Arrow<p style="font-size: small;">Jim Yosef</p></strong>                        
-                    </div>
-                    
-                    <div class="song_play_action">
-                        <fa-icon [icon]="playIcon"></fa-icon>
-                    </div>
-                </div>
-            </article>
-
-            <article class="song_box">
-                <div class="song_image_box" style="background-image: url(https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/000/287/325x325/mortals-feat-laura-brehm-1586948734-yFnA6l5Geq.jpg);"></div>
-    
-                <div class="song_data_box">                                        
-                    <div>
-                        <strong>Mortals<p style="font-size: small;">Warriyo, Laura Brehm</p></strong>                        
-                    </div>
-                    
-                    <div class="song_play_action">
-                        <fa-icon [icon]="playIcon"></fa-icon>
-                    </div>
-                </div>
-            </article>
-
-            <article class="song_box">
-                <div class="song_image_box" style="background-image: url(https://linkstorage.linkfire.com/medialinks/images/6be07b10-061e-4ce7-a7fb-271f75f5b34c/artwork-440x440.jpg);"></div>
-    
-                <div class="song_data_box">                                        
-                    <div>
-                        <strong>Lost<p style="font-size: small;">Tobu</p></strong>
-                    </div>
-                    
-                    <div class="song_play_action">
-                        <fa-icon [icon]="playIcon"></fa-icon>
-                    </div>
-                </div>
-            </article>
-
-            <article class="song_box">
-                <div class="song_image_box" style="background-image: url(https://i1.sndcdn.com/artworks-000075049437-nhywpg-t500x500.jpg);"></div>
-    
-                <div class="song_data_box">                                        
-                    <div>
-                        <strong>Hope<p style="font-size: small;">Tobu</p></strong>
-                    </div>
-                    
                     <div class="song_play_action">
                         <fa-icon [icon]="playIcon"></fa-icon>
                     </div>
@@ -97,121 +31,35 @@
         </header>
 
         <article class="songs_list">
-            <article class="song_box">
-                <div class="song_image_box" style="background-image: url(https://linkstorage.linkfire.com/medialinks/images/85803633-60c7-45b2-9819-239964911c37/artwork-440x440.jpg);"></div>
-    
-                <div class="song_data_box">
-                    <div>
-                        <strong>Link<p style="font-size: small;">Jim Yosef</p></strong>                        
+            <article class="songs_list">
+                <article *ngFor="let song of welcomeSongs.recentReleases" class="song_box" (click)="selectSong(song, audioPlayer)">
+                    <div class="song_image_box" [style]="{ 'background-image': 'url(' + song.thumbnailPath + ')'}"></div>
+        
+                    <div class="song_data_box">
+                        <div>
+                            <strong>{{song.title}}<p style="font-size: small;">{{song.authors.join(', ')}}</p></strong> 
+                        </div>
+        
+                        <div class="song_play_action">
+                            <fa-icon [icon]="playIcon"></fa-icon>
+                        </div>
                     </div>
-    
-                    <div class="song_play_action">
-                        <fa-icon [icon]="playIcon"></fa-icon>
-                    </div>
-                </div>
-            </article>
-    
-            <article class="song_box">
-                <div class="song_image_box" style="background-image: url(https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/000/936/325x325/royalty-1619082030-xBgqGZWLw9.jpg);"></div>
-    
-                <div class="song_data_box">                                        
-                    <div>
-                        <strong>Royalty<p style="font-size: small;">Maestro Chives, Egzod, Neoni</p></strong>                        
-                    </div>
-    
-                    <div class="song_play_action">
-                        <fa-icon [icon]="playIcon"></fa-icon>
-                    </div>
-                </div>
-            </article>
-    
-            <article class="song_box">
-                <div class="song_image_box" style="background-image: url(https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/000/172/1000x0/arrow-1586947152-LUmQRKQIRc.jpg);"></div>
-    
-                <div class="song_data_box">                                        
-                    <div>
-                        <strong>Arrow<p style="font-size: small;">Jim Yosef</p></strong>                        
-                    </div>
-                    
-                    <div class="song_play_action">
-                        <fa-icon [icon]="playIcon"></fa-icon>
-                    </div>
-                </div>
-            </article>
-
-            <article class="song_box">
-                <div class="song_image_box" style="background-image: url(https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/000/287/325x325/mortals-feat-laura-brehm-1586948734-yFnA6l5Geq.jpg);"></div>
-    
-                <div class="song_data_box">                                        
-                    <div>
-                        <strong>Mortals<p style="font-size: small;">Warriyo, Laura Brehm</p></strong>                        
-                    </div>
-                    
-                    <div class="song_play_action">
-                        <fa-icon [icon]="playIcon"></fa-icon>
-                    </div>
-                </div>
-            </article>
-
-            <article class="song_box">
-                <div class="song_image_box" style="background-image: url(https://linkstorage.linkfire.com/medialinks/images/6be07b10-061e-4ce7-a7fb-271f75f5b34c/artwork-440x440.jpg);"></div>
-    
-                <div class="song_data_box">                                        
-                    <div>
-                        <strong>Lost<p style="font-size: small;">Tobu</p></strong>
-                    </div>
-                    
-                    <div class="song_play_action">
-                        <fa-icon [icon]="playIcon"></fa-icon>
-                    </div>
-                </div>
-            </article>
-
-            <article class="song_box">
-                <div class="song_image_box" style="background-image: url(https://i1.sndcdn.com/artworks-000075049437-nhywpg-t500x500.jpg);"></div>
-    
-                <div class="song_data_box">                                        
-                    <div>
-                        <strong>Hope<p style="font-size: small;">Tobu</p></strong>
-                    </div>
-                    
-                    <div class="song_play_action">
-                        <fa-icon [icon]="playIcon"></fa-icon>
-                    </div>
-                </div>
-            </article>
-
-            <article class="song_box">
-                <div class="song_image_box" style="background-image: url(https://i1.sndcdn.com/artworks-000186538711-d19l93-t500x500.jpg);"></div>
-    
-                <div class="song_data_box">                                        
-                    <div>
-                        <strong>Fade<p style="font-size: small;">Alan Walker</p></strong>
-                    </div>
-                    
-                    <div class="song_play_action">
-                        <fa-icon [icon]="playIcon"></fa-icon>
-                    </div>
-                </div>
+                </article>
             </article>
         </article>
     </section>
 
     @if(showPlayerBar) {
         <div id="player">
-            <audio #audioPlayer (timeupdate)="onTimeUpdate(audioPlayer)" controls>            
-                <source [src]="currentTrack.url" type="audio/mp3">    
-            </audio>
-
             <div class="player-controls">     
-                <button (click)="showPlayerBar = !showPlayerBar">
+                <button (click)="hidePlayer(audioPlayer)">
                     <fa-icon [icon]="hidePlayerBarIcon"></fa-icon>&nbsp;Hide
                 </button>
 
                 <div class="player_group">
-                    <div class="player_song_image" style="background-image: url(https://i1.sndcdn.com/artworks-000186538711-d19l93-t500x500.jpg);"></div>
+                    <div class="player_song_image" [style]="{ 'background-image': 'url(' + currentSong.thumbnailPath + ')'}"></div>
                     <div>
-                        <p>{{currentTrack.title}}</p>
+                        <p>{{currentSong.title}} - {{currentSong.authors.join(', ')}}</p>
                     </div>  
                 </div>            
 

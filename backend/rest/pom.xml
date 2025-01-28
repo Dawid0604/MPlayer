@@ -12,4 +12,18 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>pl.dawid0604.mplayer</groupId>
     <artifactId>rest</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>pl.dawid0604.mplayer</groupId>
+            <artifactId>service-rest</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>pl.dawid0604.mplayer</groupId>
+            <artifactId>utils</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>
