@@ -55,16 +55,13 @@ public class SongEntity extends EntityBase {
 
     public SongEntity(final String encryptedId, final String title,
                       final String thumbnailPath, final String soundLink,
-                      final List<SongAuthorEntity> authors, final LocalDate releaseDate,
-                      final int numberOfListens) {
+                      final List<SongAuthorEntity> authors) {
 
         super(encryptedId);
         this.title = title;
         this.thumbnailPath = thumbnailPath;
         this.authors = authors;
         this.soundLink = soundLink;
-        this.releaseDate = releaseDate;
-        this.numberOfListens = numberOfListens;
     }
 
     public SongEntity(final String encryptedId, final String title,

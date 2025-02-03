@@ -6,21 +6,28 @@
     <nav id="actions_box">        
         <div class="action_item">            
             <div class="list">
-                <button *ngFor="let genre of songGenres" [ngStyle]="{ 'background-color': genre.color ? genre.color : '' }">{{genre.name}}</button>
+                <button *ngFor="let genre of songGenres" [ngStyle]="{ 'background-color': genre.color ? genre.color : '' }"
+                        [ngClass]="selectedSongGenres.includes(genre.encryptedId) ? 'selected_genre_mood' : ''" (click)="selectGenre(genre.encryptedId)">{{genre.name}}</button>
             </div>            
         </div>
 
         <div class="action_item">         
             <div class="list">
-                <button *ngFor="let mood of songMoods" [ngStyle]="{ 'background-color': mood.color ? mood.color : '' }">{{mood.name}}</button>
+                <button *ngFor="let mood of songMoods" [ngStyle]="{ 'background-color': mood.color ? mood.color : '' }"
+                        [ngClass]="selectedSongMoods.includes(mood.encryptedId) ? 'selected_genre_mood' : ''" (click)="selectMood(mood.encryptedId)">{{mood.name}}</button>
             </div>            
         </div>
 
         <div class="action_item_grouped">
-            <input type="text" id="search_input" placeholder="Search by name">
-            <button type="submit">
-                <fa-icon [icon]="searchIcon"></fa-icon>
-            </button>
+            <form name="form" (ngSubmit)="discoverByText()" #f="ngForm">
+                <input type="text" id="search_input" placeholder="Search by name" [(ngModel)]="form.text" #text="ngModel" name="text">
+                <button type="button" title="Reset" (click)="resetSelections()">
+                    <fa-icon [icon]="resetIcon"></fa-icon>
+                </button>
+                <button type="submit" title="Find">
+                    <fa-icon [icon]="searchIcon"></fa-icon>
+                </button>
+            </form>
         </div>
     </nav>
 
@@ -34,7 +41,7 @@
                 <div>Actions</div>                
             </article>            
 
-            <article *ngFor="let song of discoveredSongs.songs" class="list_item" (click)="selectSong(song, audioPlayer)">
+            <article *ngFor="let song of discoveredSongs.songs" class="list_item" (click)="selectSong(song, audioPlayer)" [ngClass]="song === currentSong ? 'list_item_selected' : ''">
                 <div [style]="{ 'background-image': 'url(' + song.thumbnailPath + ')'}"></div>
                 <div>{{song.title}} - {{song.authors.join(', ')}}</div>
                 <div class="song_colors">
@@ -52,17 +59,9 @@
 
         <footer>
             <div id="pagination">
-                <button><</button>
-                <!-- <button *ngFor="let">
-
-                </button> -->
-
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>{{discoveredSongs.pageable.totalPages}}</button>
-                <button>></button>
+                <button (click)="navigate(getPreviousPage())" [disabled]="discoveredSongs.pageable.first"><</button>                
+                <button>{{discoveredSongs.pageable.totalPages > 0 ? discoveredSongs.pageable.pageNumber + 1 : 0}}&nbsp;/&nbsp;{{discoveredSongs.pageable.totalPages}}</button>                     
+                <button (click)="navigate(getNextPage())" [disabled]="discoveredSongs.pageable.last">></button>
             </div>
      
             @if(showPlayerBar) {

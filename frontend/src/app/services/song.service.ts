@@ -30,14 +30,14 @@ export class SongService {
     return this.httpClient.patch<any>(`${this.API}/listening/${songId}/handle`, { });
   }
 
-  discoverSongs(searchedText?: string, pageNumber?: number,
-                genres?: string[], moods?: string[]): Observable<DiscoverSongsDTO> {
+  discoverSongs(pageNumber: number, searchedText: string,
+                genres: string[], moods: string[]): Observable<DiscoverSongsDTO> {
 
     return this.httpClient.post<DiscoverSongsDTO>(`${this.API}/discover`, { 
       searchedText: searchedText,
       genres: genres,
       moods: moods,
-      pageNumber: pageNumber ? (pageNumber - 1) : 0,
+      pageNumber: pageNumber,
       pageSize: 8
     });
   }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { faCirclePlay, faCirclePlus, faCircleStop, faClock, faEyeSlash, faVolumeHigh, faVolumeLow } from '@fortawesome/free-solid-svg-icons'
+import { faCirclePlay, faCirclePlus, faCircleStop, faClock, faEraser, faEyeSlash, faVolumeHigh, faVolumeLow } from '@fortawesome/free-solid-svg-icons'
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
-import { DiscoverSongsDTO, SongDTO } from '../../model/DiscoverSongsDTO';
+import { DiscoverSongsDTO, Pageable, SongDTO } from '../../model/DiscoverSongsDTO';
 import { SongService } from '../../services/song.service';
 import { SongMoodDTO } from '../../model/SongMoodDTO';
 import { SongGenreDTO } from '../../model/SongGenreDTO';
@@ -22,23 +22,31 @@ export class DiscoverComponent implements OnInit {
   volumeHighIcon = faVolumeHigh;
   volumeLowIcon = faVolumeLow;
   songTimeIcon = faClock;
+  resetIcon = faEraser
 
   showPlayerBar = false;
   isPlaying = false;
   currentTime = 0;
   volume = 1;
-
+  
   currentSong: SongDTO = { } as SongDTO;  
-  discoveredSongs: DiscoverSongsDTO = { } as DiscoverSongsDTO;
+  discoveredSongs: DiscoverSongsDTO = { 
+    songs: [ ] as SongDTO[],
+    pageable: { } as Pageable
+  } as DiscoverSongsDTO;
+  
   songMoods: SongMoodDTO[] = [ ];
   songGenres: SongGenreDTO[] = [ ];
-  pageNumber = 1;
+  selectedSongMoods: string[] = [ ];
+  selectedSongGenres: string[] = [ ];
+  searchedText: string = "";
+  form: any = { };
  
   constructor(private songService: SongService) { }
  
   ngOnInit(): void {
     this.songService
-        .discoverSongs()
+        .discoverSongs(0, this.searchedText, this.selectedSongGenres, this.selectedSongMoods)
         .subscribe({
           next: _res => this.discoveredSongs = _res,
           error: _err => console.log(_err)
@@ -58,8 +66,86 @@ export class DiscoverComponent implements OnInit {
           error: _err => console.log(_err)
     })
   }
+
+  navigate(pageNumber: number) {    
+    this.songService
+        .discoverSongs(pageNumber, this.searchedText, this.selectedSongGenres, this.selectedSongMoods)
+        .subscribe({
+          next: _res => this.discoveredSongs = _res,
+          error: _err => console.log(_err)
+        })
+  }
+
+  getNextPage(): number {
+    const currentPage = this.discoveredSongs.pageable.pageNumber;
+    return (currentPage + 1) < this.discoveredSongs.pageable.totalPages ? currentPage + 1 : 0;
+  }
+
+  getPreviousPage(): number {
+    const currentPage = this.discoveredSongs.pageable.pageNumber;
+    return (currentPage - 1) > 0 ? currentPage - 1 : 0;
+  }
+
+  selectGenre(genreId: string) {        
+    if(genreId) {          
+      if(!this.selectedSongGenres.includes(genreId)) {
+        this.selectedSongGenres.push(genreId);             
+
+      } else {
+        this.selectedSongGenres = this.selectedSongGenres.filter(_genreId => _genreId !== genreId);
+      }    
+      
+      this.discoverSongs();
+    }
+  }
+  
+  selectMood(moodId: string) {
+    if(moodId) {
+      if(!this.selectedSongMoods.includes(moodId)) {
+        this.selectedSongMoods.push(moodId);          
+
+      } else {
+        this.selectedSongMoods = this.selectedSongMoods.filter(_moodId => _moodId !== moodId);
+      }
+
+      this.discoverSongs();
+    }
+  }
+
+  resetSelections() {
+    this.selectedSongGenres = [ ];
+    this.selectedSongMoods = [ ];
+    this.form.text = '';
+    this.searchedText = '';    
+    this.discoverSongs();
+  }
+
+  discoverByText() {
+    if(this.form.text && this.form.text.length >= 3) {
+      this.searchedText = this.form.text;
+      this.discoverSongs();
+      this.form.text = "";
+    }
+  }
+
+  private discoverSongs() {
+    this.songService
+        .discoverSongs(this.discoveredSongs.pageable.pageNumber, this.searchedText, this.selectedSongGenres, this.selectedSongMoods)
+        .subscribe({
+          next: _res => this.discoveredSongs = _res,
+          error: _err => console.log(_err)
+        })
+  }
+
+  showPlaylists() {
+
+  }
+
+  addSongToPlaylist(song: SongDTO, playlistId: string) {
+
+  }
  
-  selectSong(song: SongDTO, audioElement: HTMLAudioElement) {
+  selectSong(song: SongDTO, audioElement: HTMLAudioElement) {    
     this.currentSong = song;
     this.showPlayerBar = true;
     this.isPlaying = false;

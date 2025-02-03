@@ -2,20 +2,21 @@ package pl.dawid0604.mplayer.song;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.dawid0604.mplayer.tools.RegexTool;
 
-import java.time.LocalDate;
-import java.util.*;
+import java.sql.Date;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
+import static org.apache.commons.lang3.StringUtils.*;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static pl.dawid0604.mplayer.tools.RegexTool.*;
 
 @Service
 @RequiredArgsConstructor
@@ -25,72 +26,116 @@ class SongDaoServiceImpl implements SongDaoService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    private static final String TRUE_EXPRESSION = "TRUE";
+    private static final String AND_EXPRESSION = " AND ";
+    private static final String OR_EXPRESSION = " OR ";
+    private static final String SINGLE_QUOTE = "'";
+    private static final String AGAINST_MATCH_EXPRESSION = "MATCH (%s) AGAINST ('*%s*' IN BOOLEAN MODE)";
+    private static final Pattern IGNORED_SEARCHED_TEXT_CHARACTERS_PATTERN = Pattern.compile("[<>()~*+\\-'\"]");
+
+    private static final String DISCOVER_QUERY = """
+                SELECT s.EncryptedId, s.Title, s.ThumbnailPath, s.SoundLink, s.ReleaseDate,
+                       GROUP_CONCAT(DISTINCT sa.Name ORDER BY sa.Name ASC SEPARATOR ', ') AS Authors,
+                       GROUP_CONCAT(DISTINCT CONCAT(m.EncryptedId, ':', m.Name, ':', m.color) ORDER BY m.Name ASC SEPARATOR ', ') AS Moods,
+                       GROUP_CONCAT(DISTINCT CONCAT(g.EncryptedId, ':', g.Name, ':', g.color) ORDER BY g.Name ASC SEPARATOR ', ') AS Genres
+                FROM Songs as s
+                LEFT JOIN SongAuthorsLinks as asl ON asl.SongId = s.Id
+                LEFT JOIN SongAuthors as sa ON asl.AuthorId = sa.Id
+                INNER JOIN SongMoodsLinks as msl ON msl.SongId = s.Id
+                INNER JOIN SongMoods as m ON msl.MoodId = m.Id
+                INNER JOIN SongGenresLinks as gsl ON gsl.SongId = s.Id
+                INNER JOIN SongGenres as g ON gsl.GenreId = g.Id
+                WHERE ("%1$s" = 'TRUE' OR EXISTS(SELECT 1 FROM Songs as sub_s
+                                                 LEFT JOIN SongAuthorsLinks AS sub_asl ON sub_asl.SongId = sub_s.Id
+                                                 LEFT JOIN SongAuthors AS sub_sa ON sub_asl.AuthorId = sub_sa.Id
+                                                 WHERE sub_s.Id = s.Id
+                                                 AND %1$s )
+                      ) AND
+                      ('' IN (%2$s) OR (
+                        (SELECT COUNT(DISTINCT sub_m.EncryptedId)
+                         FROM SongMoodsLinks as sub_msl
+                         INNER JOIN SongMoods as sub_m ON sub_msl.MoodId = sub_m.Id
+                         WHERE sub_msl.SongId = s.Id AND sub_m.EncryptedId IN (%2$s)) = (SELECT COUNT(*) FROM (SELECT EncryptedId FROM SongMoods WHERE EncryptedId IN (%2$s)) as count_m)
+                      )) AND
+                      ('' IN (%3$s) OR (
+                        (SELECT COUNT(DISTINCT sub_g.EncryptedId)
+                         FROM SongGenresLinks as sub_gsl
+                         INNER JOIN SongGenres as sub_g ON sub_gsl.GenreId = sub_g.Id
+                         WHERE sub_gsl.SongId = s.Id AND sub_g.EncryptedId IN (%3$s)) = (SELECT COUNT(*) FROM (SELECT EncryptedId FROM SongGenres WHERE EncryptedId IN (%3$s)) as count_g)
+                      ))
+                GROUP BY s.Id
+                LIMIT %4$s OFFSET %5$s
+            """;
+
+    private static final String COUNT_DISCOVER_QUERY = """
+                SELECT COUNT(DISTINCT s.Id)
+                FROM Songs as s
+                LEFT JOIN SongAuthorsLinks as asl ON asl.SongId = s.Id
+                LEFT JOIN SongAuthors as sa ON asl.AuthorId = sa.Id
+                INNER JOIN SongMoodsLinks as msl ON msl.SongId = s.Id
+                INNER JOIN SongMoods as m ON msl.MoodId = m.Id
+                INNER JOIN SongGenresLinks as gsl ON gsl.SongId = s.Id
+                INNER JOIN SongGenres as g ON gsl.GenreId = g.Id
+                WHERE ("%1$s" = 'TRUE' OR EXISTS(SELECT 1 FROM Songs as sub_s
+                                                 LEFT JOIN SongAuthorsLinks AS sub_asl ON sub_asl.SongId = sub_s.Id
+                                                 LEFT JOIN SongAuthors AS sub_sa ON sub_asl.AuthorId = sub_sa.Id
+                                                 WHERE sub_s.Id = s.Id
+                                                 AND %1$s )
+                      ) AND
+                      ('' IN (%2$s) OR (
+                        (SELECT COUNT(DISTINCT sub_m.EncryptedId)
+                         FROM SongMoodsLinks as sub_msl
+                         INNER JOIN SongMoods as sub_m ON sub_msl.MoodId = sub_m.Id
+                         WHERE sub_msl.SongId = s.Id AND sub_m.EncryptedId IN (%2$s)) = (SELECT COUNT(*) FROM (SELECT EncryptedId FROM SongMoods WHERE EncryptedId IN (%2$s)) as count_m)
+                      )) AND
+                      ('' IN (%3$s) OR (
+                        (SELECT COUNT(DISTINCT sub_g.EncryptedId)
+                         FROM SongGenresLinks as sub_gsl
+                         INNER JOIN SongGenres as sub_g ON sub_gsl.GenreId = sub_g.Id
+                         WHERE sub_gsl.SongId = s.Id AND sub_g.EncryptedId IN (%3$s)) = (SELECT COUNT(*) FROM (SELECT EncryptedId FROM SongGenres WHERE EncryptedId IN (%3$s)) as count_g)
+                      ))
+            """;
+
+    private static final String WELCOME_POPULAR_SONGS = """
+                SELECT s.EncryptedId, s.Title, s.ThumbnailPath, s.SoundLink,
+                       GROUP_CONCAT(DISTINCT sa.Name ORDER BY sa.Name ASC SEPARATOR ', ') AS Authors
+                FROM Songs as s
+                INNER JOIN SongAuthorsLinks as asl ON asl.SongId = s.Id
+                INNER JOIN SongAuthors as sa ON asl.AuthorId = sa.Id
+                GROUP BY s.Id
+                ORDER BY s.NumberOfListens DESC
+                LIMIT 6
+            """;
+
+    private static final String WELCOME_RECENT_SONGS = """
+                SELECT s.EncryptedId, s.Title, s.ThumbnailPath, s.SoundLink,
+                       GROUP_CONCAT(DISTINCT sa.Name ORDER BY sa.Name ASC SEPARATOR ', ') AS Authors
+                FROM Songs as s
+                INNER JOIN SongAuthorsLinks as asl ON asl.SongId = s.Id
+                INNER JOIN SongAuthors as sa ON asl.AuthorId = sa.Id
+                GROUP BY s.Id
+                ORDER BY s.releaseDate DESC
+                LIMIT 18
+            """;
+
     @Override
+    @SuppressWarnings("unchecked")
     public List<SongEntity> findWelcomePopularSongs() {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<String> songCriteriaQuery = criteriaBuilder.createQuery(String.class);
-        Root<SongEntity> songRootQuery = songCriteriaQuery.from(SongEntity.class);
-
-        songCriteriaQuery.multiselect(songRootQuery.get("encryptedId"));
-        songCriteriaQuery.orderBy(criteriaBuilder.desc(songRootQuery.get("numberOfListens")));
-
-        var foundSongsEncryptedIds = entityManager.createQuery(songCriteriaQuery)
-                                                  .setMaxResults(6)
-                                                  .getResultList();
-
-        CriteriaQuery<Object[]> detailsQuery = criteriaBuilder.createQuery(Object[].class);
-        Root<SongEntity> detailsRoot = detailsQuery.from(SongEntity.class);
-        Join<SongEntity, SongAuthorEntity> authorsJoin = detailsRoot.join("authors");
-
-        detailsQuery.distinct(true);
-        detailsQuery.where(detailsRoot.get("encryptedId").in(foundSongsEncryptedIds));
-        detailsQuery.multiselect(detailsRoot.get("encryptedId"), detailsRoot.get("title"), detailsRoot.get("thumbnailPath"),
-                                 detailsRoot.get("soundLink"), authorsJoin.get("name"), detailsRoot.get("releaseDate"),
-                                 detailsRoot.get("numberOfListens"));
-
-        return entityManager.createQuery(detailsQuery)
-                            .getResultList()
-                            .stream()
-                            .collect(groupingBy(_fields -> _fields[0]))
-                            .values()
-                            .stream()
-                            .map(this::map)
-                            .sorted(Comparator.comparing(SongEntity::getNumberOfListens).reversed())
-                            .toList();
+        return ((List<Object[]>) entityManager.createNativeQuery(WELCOME_POPULAR_SONGS)
+                                              .getResultList())
+                                              .stream()
+                                              .map(SongDaoServiceImpl::map)
+                                              .toList();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<SongEntity> findWelcomeRecentSongsReleases() {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<String> songCriteriaQuery = criteriaBuilder.createQuery(String.class);
-        Root<SongEntity> songRootQuery = songCriteriaQuery.from(SongEntity.class);
-
-        songCriteriaQuery.multiselect(songRootQuery.get("encryptedId"));
-        songCriteriaQuery.orderBy(criteriaBuilder.desc(songRootQuery.get("releaseDate")));
-
-        var foundSongsEncryptedIds = entityManager.createQuery(songCriteriaQuery)
-                                                  .setMaxResults(18)
-                                                  .getResultList();
-
-        CriteriaQuery<Object[]> detailsQuery = criteriaBuilder.createQuery(Object[].class);
-        Root<SongEntity> detailsRoot = detailsQuery.from(SongEntity.class);
-        Join<SongEntity, SongAuthorEntity> authorsJoin = detailsRoot.join("authors");
-
-        detailsQuery.distinct(true);
-        detailsQuery.where(detailsRoot.get("encryptedId").in(foundSongsEncryptedIds));
-        detailsQuery.multiselect(detailsRoot.get("encryptedId"), detailsRoot.get("title"), detailsRoot.get("thumbnailPath"),
-                                 detailsRoot.get("soundLink"), authorsJoin.get("name"), detailsRoot.get("releaseDate"),
-                                 detailsRoot.get("numberOfListens"));
-
-        return entityManager.createQuery(detailsQuery)
-                            .getResultList()
-                            .stream()
-                            .collect(groupingBy(_fields -> _fields[0]))
-                            .values()
-                            .stream()
-                            .map(this::map)
-                            .sorted(Comparator.comparing(SongEntity::getReleaseDate).reversed())
-                            .toList();
+        return ((List<Object[]>) entityManager. createNativeQuery(WELCOME_RECENT_SONGS)
+                                              .getResultList())
+                                              .stream()
+                                              .map(SongDaoServiceImpl::map)
+                                              .toList();
     }
 
     @Override
@@ -100,94 +145,95 @@ class SongDaoServiceImpl implements SongDaoService {
 
     @Override
     @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
     public PageImpl<SongEntity> discover(final String searchedText, final List<String> genres,
                                          final List<String> moods, final int pageNumber, final int pageSize) {
 
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        String parsedMoods = toString(moods);
+        String parsedGenres = toString(genres);
+        String searchedTextExpression = getSearchedTextExpression(searchedText);
 
-        CriteriaQuery<Long> countCriteriaQuery = criteriaBuilder.createQuery(Long.class);
-        Root<SongEntity> countRootQuery = countCriteriaQuery.from(SongEntity.class);
+        var songs = ((List<Object[]>) entityManager.createNativeQuery(DISCOVER_QUERY.formatted(searchedTextExpression, parsedMoods, parsedGenres, pageSize, pageNumber * pageSize))
+                                                   .getResultList())
+                                                   .stream()
+                                                   .map(SongDaoServiceImpl::mapDiscoveredSong)
+                                                   .toList();
 
-        countCriteriaQuery.multiselect(criteriaBuilder.count(countRootQuery.get("encryptedId")));
-        long totalResults = entityManager.createQuery(countCriteriaQuery)
-                                         .getSingleResult();
-
-        CriteriaQuery<String> songCriteriaQuery = criteriaBuilder.createQuery(String.class);
-        Root<SongEntity> songRootQuery = songCriteriaQuery.from(SongEntity.class);
-
-        songCriteriaQuery.multiselect(songRootQuery.get("encryptedId"));
-        var foundSongsEncryptedIds = entityManager.createQuery(songCriteriaQuery)
-                                                  .setFirstResult(pageNumber * pageSize)
-                                                  .setMaxResults(pageSize)
-                                                  .getResultList();
-
-        CriteriaQuery<Object[]> detailsQuery = criteriaBuilder.createQuery(Object[].class);
-        Root<SongEntity> detailsRoot = detailsQuery.from(SongEntity.class);
-        Join<SongEntity, SongAuthorEntity> authorsJoin = detailsRoot.join("authors");
-        Join<SongEntity, SongMoodEntity> moodsJoin = detailsRoot.join("moods");
-        Join<SongEntity, SongGenreEntity> genresJoin = detailsRoot.join("genres");
-
-        detailsQuery.distinct(true);
-        detailsQuery.multiselect(detailsRoot.get("encryptedId"), detailsRoot.get("title"), detailsRoot.get("thumbnailPath"),
-                                 detailsRoot.get("soundLink"), detailsRoot.get("releaseDate"), authorsJoin.get("name"),
-                                 moodsJoin.get("encryptedId"), moodsJoin.get("name"), moodsJoin.get("color"), genresJoin.get("encryptedId"),
-                                 genresJoin.get("name"), genresJoin.get("color"));
-
-        detailsQuery.where(detailsRoot.get("encryptedId").in(foundSongsEncryptedIds));
-        var songs = entityManager.createQuery(detailsQuery)
-                                 .getResultList()
-                                 .stream()
-                                 .collect(groupingBy(_fields -> _fields[0]))
-                                 .values()
-                                 .stream()
-                                 .map(this::mapDiscoveredSong)
-                                 .toList();
+        long totalResults = (long) entityManager.createNativeQuery(COUNT_DISCOVER_QUERY.formatted(searchedTextExpression, parsedMoods, parsedGenres))
+                                                .getSingleResult();
 
         return new PageImpl<>(songs, PageRequest.of(pageNumber, pageSize), totalResults);
     }
 
-    private SongEntity map(final List<Object[]> songWithAuthors) {
-        Object[] song = songWithAuthors.get(0);
-        List<SongAuthorEntity> songAuthors = new ArrayList<>();
-
-        if(songWithAuthors.size() > 1) {
-            for (var songWithAuthor: songWithAuthors) {
-                songAuthors.add(new SongAuthorEntity((String) songWithAuthor[4]));
-            }
-
-        } else {
-            songAuthors.add(new SongAuthorEntity((String) song[4]));
+    private static String getSearchedTextExpression(final String searchedText) {
+        if(isBlank(searchedText)) {
+            return TRUE_EXPRESSION;
         }
 
-        return new SongEntity((String) song[0], (String) song[1], (String) song[2], (String) song[3], songAuthors,
-                              (LocalDate) song[5], (int) song[6]);
+        List<String> words = RegexTool.split(searchedText, SPACE_PATTERN);
+        StringBuilder expressionBuilder = new StringBuilder();
+
+        for (String word : words) {
+            word = IGNORED_SEARCHED_TEXT_CHARACTERS_PATTERN.matcher(word)
+                                                           .replaceAll(EMPTY);
+
+            if (isNotBlank(word)) {
+                String titleExpression = AGAINST_MATCH_EXPRESSION.formatted("sub_s.Title", word);
+                String authorExpression = AGAINST_MATCH_EXPRESSION.formatted("sub_sa.Name", word);
+                String expression = "(" + titleExpression + OR_EXPRESSION + authorExpression + ")";
+
+                if (!expressionBuilder.isEmpty()) {
+                    expressionBuilder.append(AND_EXPRESSION);
+                }
+
+                expressionBuilder.append(expression);
+            }
+        }
+
+        return expressionBuilder.isEmpty() ? TRUE_EXPRESSION
+                                           : expressionBuilder.toString();
     }
 
-
-    private SongEntity mapDiscoveredSong(final List<Object[]> groupedSong) {
-        Object[] song = groupedSong.get(0);
-        Set<SongAuthorEntity> songAuthors = new HashSet<>();
-        Set<SongMoodEntity> songMoods = new HashSet<>();
-        Set<SongGenreEntity> songGenres = new HashSet<>();
-
-        for (var _song: groupedSong) {
-            String tempValue;
-
-            if((tempValue = (String) _song[5]) != null) {
-                songAuthors.add(new SongAuthorEntity(tempValue));
-            }
-
-            if((tempValue = (String) _song[9]) != null) {
-                songGenres.add(new SongGenreEntity(tempValue, (String) _song[10], (String) _song[11]));
-            }
-
-            if((tempValue = (String) _song[6]) != null) {
-                songMoods.add(new SongMoodEntity(tempValue, (String) _song[7], (String) _song[8]));
-            }
+    private static String toString(final List<String> list) {
+        if(!isEmpty(list)) {
+            return list.stream()
+                       .map(_elm -> SINGLE_QUOTE + _elm + SINGLE_QUOTE)
+                       .collect(Collectors.joining(", "));
+        } else {
+            return SINGLE_QUOTE + SINGLE_QUOTE;
         }
+    }
+
+    private static SongEntity map(final Object[] song) {
+        List<SongAuthorEntity> songAuthors = RegexTool.split((String) song[4], COMMA_PATTERN)
+                                                      .stream()
+                                                      .map(_groupedFields -> RegexTool.split(_groupedFields, COLON_PATTERN))
+                                                      .flatMap(List::stream)
+                                                      .map(SongAuthorEntity::new)
+                                                      .toList();
+
+        return new SongEntity((String) song[0], (String) song[1], (String) song[2], (String) song[3], songAuthors);
+    }
+
+    private static SongEntity mapDiscoveredSong(final Object[] song) {
+        List<SongAuthorEntity> songAuthors = RegexTool.split((String) song[5], COMMA_PATTERN)
+                                                      .stream()
+                                                      .map(_groupedFields -> RegexTool.split(_groupedFields, COLON_PATTERN))
+                                                      .flatMap(List::stream)
+                                                      .map(SongAuthorEntity::new)
+                                                      .toList();
+        
+        List<SongMoodEntity> songMoods = RegexTool.split((String) song[6], COMMA_PATTERN)
+                                                  .stream()
+                                                  .map(_groupedFields -> RegexTool.split(_groupedFields, COLON_PATTERN))
+                                                  .map(_fields -> new SongMoodEntity(_fields.get(0), _fields.get(1), _fields.get(2))).toList();
+        
+        List<SongGenreEntity> songGenres = RegexTool.split((String) song[7], COMMA_PATTERN)
+                                                    .stream()
+                                                    .map(_groupedFields -> RegexTool.split(_groupedFields, COLON_PATTERN))
+                                                    .map(_fields -> new SongGenreEntity(_fields.get(0), _fields.get(1), _fields.get(2))).toList();
 
         return new SongEntity((String) song[0], (String) song[1], (String) song[2], (String) song[3],
-                              (LocalDate) song[4], songAuthors.stream().toList(), songMoods.stream().toList(),
-                              songGenres.stream().toList());
+                              ((Date) song[4]).toLocalDate(), songAuthors, songMoods, songGenres);
     }
 }

@@ -31,6 +31,14 @@ main {
     align-items: center;    
 }
 
+.action_item_grouped form {
+    width: 100%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .action_item_grouped {    
     background-color: #181a1b;    
     border-radius: 0.5em;
@@ -94,8 +102,12 @@ footer {
     justify-content: center;
 }
 
-#pagination, #player {
-    width: 40%;
+.selected_genre_mood {
+    border: 0.2em solid white !important;
+    box-sizing: border-box;    
+}
+
+#pagination, #player {    
     height: 100%;
     display: flex;
     justify-content: center;
@@ -104,6 +116,14 @@ footer {
     background-color: #181a1b;    
     border-radius: 1em;
     margin: 1.5em;
+}
+
+#player {
+    width: 50%;
+}
+
+#pagination {
+    width: 30%;
 }
 
 .list_item {
@@ -122,6 +142,10 @@ audio {
     display: none;
 }
 
+.volume-bar {
+    cursor: pointer;
+}
+
 .list_item > div:first-child {
     width: 5vw;
     height: 5vh;
@@ -130,9 +154,14 @@ audio {
     background-position: center;    
 }
 
-.list_item:hover:not(:first-child) {
-    background-color: #d1d2d3;
-    color: black;
+.list_item:first-child { 
+    cursor: default;
+}
+
+.list_item:hover:not(:first-child), .list_item_selected {
+    transition-duration: 0ms;
+    border: 0.3em solid #d1d2d3;
+    box-sizing: border-box;
 }
 
 .list_item:first-child {
@@ -174,7 +203,7 @@ audio {
     background-color: #181a1b;
 }
 
-#pagination > button:hover, #pagination > button:nth-child(2) {
+#pagination > button:not(button[disabled]):hover, #pagination > button:nth-child(2) {
     border-radius: 0.75em;
     background-color: #242728;    
 }
@@ -265,12 +294,20 @@ audio {
     outline: none;
 }
 
-button[type='submit'] {    
+form > button {    
     color: white;
-    outline: none;
+    outline: none;    
+    cursor: pointer;
+}
+
+form > button[type='submit'] {
     border: 2px solid #1e7c40;
     background-color: #1e7c40;
-    cursor: pointer;
+}
+
+form > button[type='button'] {
+    border: 2px solid #af4f00;
+    background-color: #af4f00;
 }
 
 button[type='submit']:hover {
