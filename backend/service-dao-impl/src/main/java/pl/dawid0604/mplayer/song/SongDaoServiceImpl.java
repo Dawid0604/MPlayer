@@ -39,17 +39,17 @@ class SongDaoServiceImpl implements SongDaoService {
                        GROUP_CONCAT(DISTINCT CONCAT(m.EncryptedId, ':', m.Name, ':', m.color) ORDER BY m.Name ASC SEPARATOR ', ') AS Moods,
                        GROUP_CONCAT(DISTINCT CONCAT(g.EncryptedId, ':', g.Name, ':', g.color) ORDER BY g.Name ASC SEPARATOR ', ') AS Genres
                 FROM Songs as s
-                LEFT JOIN SongAuthorsLinks as asl ON asl.SongId = s.Id
-                LEFT JOIN SongAuthors as sa ON asl.AuthorId = sa.Id
+                INNER JOIN SongAuthorsLinks as asl ON asl.SongId = s.Id
+                INNER JOIN SongAuthors as sa ON asl.AuthorId = sa.Id
                 INNER JOIN SongMoodsLinks as msl ON msl.SongId = s.Id
                 INNER JOIN SongMoods as m ON msl.MoodId = m.Id
                 INNER JOIN SongGenresLinks as gsl ON gsl.SongId = s.Id
                 INNER JOIN SongGenres as g ON gsl.GenreId = g.Id
                 WHERE ("%1$s" = 'TRUE' OR EXISTS(SELECT 1 FROM Songs as sub_s
-                                                 LEFT JOIN SongAuthorsLinks AS sub_asl ON sub_asl.SongId = sub_s.Id
-                                                 LEFT JOIN SongAuthors AS sub_sa ON sub_asl.AuthorId = sub_sa.Id
+                                                 INNER JOIN SongAuthorsLinks AS sub_asl ON sub_asl.SongId = sub_s.Id
+                                                 INNER JOIN SongAuthors AS sub_sa ON sub_asl.AuthorId = sub_sa.Id
                                                  WHERE sub_s.Id = s.Id
-                                                 AND %1$s )
+                                                 AND %1$s)
                       ) AND
                       ('' IN (%2$s) OR (
                         (SELECT COUNT(DISTINCT sub_m.EncryptedId)
@@ -70,17 +70,17 @@ class SongDaoServiceImpl implements SongDaoService {
     private static final String COUNT_DISCOVER_QUERY = """
                 SELECT COUNT(DISTINCT s.Id)
                 FROM Songs as s
-                LEFT JOIN SongAuthorsLinks as asl ON asl.SongId = s.Id
-                LEFT JOIN SongAuthors as sa ON asl.AuthorId = sa.Id
+                INNER JOIN SongAuthorsLinks as asl ON asl.SongId = s.Id
+                INNER JOIN SongAuthors as sa ON asl.AuthorId = sa.Id
                 INNER JOIN SongMoodsLinks as msl ON msl.SongId = s.Id
                 INNER JOIN SongMoods as m ON msl.MoodId = m.Id
                 INNER JOIN SongGenresLinks as gsl ON gsl.SongId = s.Id
                 INNER JOIN SongGenres as g ON gsl.GenreId = g.Id
                 WHERE ("%1$s" = 'TRUE' OR EXISTS(SELECT 1 FROM Songs as sub_s
-                                                 LEFT JOIN SongAuthorsLinks AS sub_asl ON sub_asl.SongId = sub_s.Id
-                                                 LEFT JOIN SongAuthors AS sub_sa ON sub_asl.AuthorId = sub_sa.Id
+                                                 INNER JOIN SongAuthorsLinks AS sub_asl ON sub_asl.SongId = sub_s.Id
+                                                 INNER JOIN SongAuthors AS sub_sa ON sub_asl.AuthorId = sub_sa.Id
                                                  WHERE sub_s.Id = s.Id
-                                                 AND %1$s )
+                                                 AND %1$s)
                       ) AND
                       ('' IN (%2$s) OR (
                         (SELECT COUNT(DISTINCT sub_m.EncryptedId)
@@ -131,7 +131,7 @@ class SongDaoServiceImpl implements SongDaoService {
     @Override
     @SuppressWarnings("unchecked")
     public List<SongEntity> findWelcomeRecentSongsReleases() {
-        return ((List<Object[]>) entityManager. createNativeQuery(WELCOME_RECENT_SONGS)
+        return ((List<Object[]>) entityManager.createNativeQuery(WELCOME_RECENT_SONGS)
                                               .getResultList())
                                               .stream()
                                               .map(SongDaoServiceImpl::map)
