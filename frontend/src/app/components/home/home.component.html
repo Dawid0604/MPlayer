@@ -10,7 +10,7 @@
 
         <article class="songs_list">
             <article *ngFor="let song of welcomeSongs.popular" class="song_box" (click)="selectSong(song, audioPlayer)">
-                <div class="song_image_box"  [style]="{ 'background-image': 'url(' + song.thumbnailPath + ')'}"></div>
+                <div class="song_image_box" [style]="{ 'background-image': 'url(' + song.thumbnailPath + ')'}"></div>
     
                 <div class="song_data_box">
                     <div>

@@ -16,6 +16,10 @@ public final class DateFormatter {
         return DATE_FORMAT.format(date);
     }
 
+    public static String withDateFormat(@NonNull final LocalDateTime date) {
+        return DATE_FORMAT.format(date);
+    }
+
     public static LocalDateTime getCurrentDate() {
         return LocalDateTime.now(systemDefaultZone());
     }

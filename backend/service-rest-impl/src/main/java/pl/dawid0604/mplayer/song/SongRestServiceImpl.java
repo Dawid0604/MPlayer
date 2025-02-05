@@ -48,14 +48,14 @@ class SongRestServiceImpl implements SongRestService {
         return new DiscoverSongsDTO(pageableDTO, songs);
     }
 
-    private static WelcomeSongsDTO.SongDTO map(final SongEntity songEntity) {
+    private static SongDTO map(final SongEntity songEntity) {
         var authors = songEntity.getAuthors()
                                 .stream()
                                 .map(SongAuthorEntity::getName)
                                 .toList();
 
-        return new WelcomeSongsDTO.SongDTO(songEntity.getEncryptedId(), songEntity.getTitle(), authors,
-                                           songEntity.getThumbnailPath(), songEntity.getSoundLink());
+        return new SongDTO(songEntity.getEncryptedId(), songEntity.getTitle(), authors,
+                           songEntity.getThumbnailPath(), songEntity.getSoundLink());
     }
 
     private static DiscoverSongsDTO.SongDTO mapDiscoverSong(final SongEntity songEntity) {

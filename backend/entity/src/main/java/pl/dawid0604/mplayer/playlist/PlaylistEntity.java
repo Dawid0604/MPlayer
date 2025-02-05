@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static lombok.AccessLevel.PRIVATE;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Entity
 @NoArgsConstructor
@@ -37,4 +38,17 @@ public class PlaylistEntity extends EntityBase {
                joinColumns = @JoinColumn(name = "PlaylistId"),
                inverseJoinColumns = @JoinColumn(name = "SongId"))
     private List<SongEntity> songs;
+
+    @SuppressWarnings("unused")
+    public PlaylistEntity(final String encryptedId, final String name, final LocalDateTime createdDate) {
+        super(encryptedId);
+        this.name = name;
+        this.createdDate = createdDate;
+    }
+
+    public void setSongs(final List<SongEntity> songs) {
+        if(isEmpty(this.songs)) {
+            this.songs = songs;
+        }
+    }
 }

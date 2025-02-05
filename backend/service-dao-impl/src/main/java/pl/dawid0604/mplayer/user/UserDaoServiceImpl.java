@@ -16,4 +16,10 @@ class UserDaoServiceImpl implements UserDaoService {
     public Optional<UserEntity> findByUsername(final String username) {
         return userRepository.findUsernamePasswordRoleByUsername(username);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Long> findIdByUsername(final String username) {
+        return userRepository.findIdByUsername(username);
+    }
 }

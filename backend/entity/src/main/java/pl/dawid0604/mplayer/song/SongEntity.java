@@ -5,7 +5,6 @@ import lombok.*;
 import pl.dawid0604.mplayer.EntityBase;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity

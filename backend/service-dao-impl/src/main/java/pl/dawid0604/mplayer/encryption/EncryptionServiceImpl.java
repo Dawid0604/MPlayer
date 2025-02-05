@@ -1,13 +1,9 @@
 package pl.dawid0604.mplayer.encryption;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import pl.dawid0604.mplayer.exception.DecryptionException;
 import pl.dawid0604.mplayer.exception.EncryptionException;
-import pl.dawid0604.mplayer.song.SongGenreRepository;
-import pl.dawid0604.mplayer.song.SongMoodRepository;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -31,7 +27,6 @@ class EncryptionServiceImpl implements EncryptionService {
     }
 
     @Override
-
     public long decryptId(final String encryptedId) {
         return decrypt(encryptedId);
     }
