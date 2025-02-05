@@ -51,7 +51,7 @@
     </article>
 
     <aside id="aside_box">
-        <section id="playlist_content">
+        <section class="playlist_content">
             <header>
                 <h3>Playlists</h3>
                 <div class="playlist_controls">
@@ -80,7 +80,7 @@
             </div>
         </section>
 
-        <section id="playlist_content">
+        <section class="playlist_content">
             <header>
                 <h3>Playlist songs</h3>
                 <div class="playlist_controls">
@@ -99,16 +99,16 @@
                 <div class="player_song_image" (click)="selectSong(_pos, song, audioPlayer)" [style]="{ 'background-image': 'url(' + song.thumbnailPath + ')'}"></div>
                 <div (click)="selectSong(_pos, song, audioPlayer)" class="song_title_box">{{song.title}}<p style="font-size: smaller;">{{song.authors.join(', ')}}</p></div>
                 <div>
-                    <button>
+                    <button [disabled]="_pos === selectedSongIndex" (click)="deleteSong(song.encryptedId)">
                         <fa-icon [icon]="deletePlaylistIcon"></fa-icon>                    
                     </button>
                     
-                    <button>
-                        <fa-icon [icon]="upIcon"></fa-icon>                     
+                    <button [disabled]="_pos === 0" (click)="decreaseSongPosition(song.encryptedId, _pos)">
+                        <fa-icon [icon]="upIcon"></fa-icon>
                     </button>
     
-                    <button>
-                        <fa-icon [icon]="downIcon"></fa-icon>                    
+                    <button [disabled]="_pos === playlistDetails.songs.length - 1" (click)="increaseSongPosition(song.encryptedId, _pos)">
+                        <fa-icon [icon]="downIcon"></fa-icon>
                     </button>
                 </div>
             </div>

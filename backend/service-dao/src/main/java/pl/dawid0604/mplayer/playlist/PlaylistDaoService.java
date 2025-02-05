@@ -8,4 +8,10 @@ public interface PlaylistDaoService {
     PlaylistEntity getDetailsById(long playlistId);
 
     long countSongsByPlaylistId(long playlistId);
+
+    void increaseSongPosition(long playlistId, long songId);
+
+    void decreaseSongPosition(long playlistId, long songId);
+
+    void deleteSong(long playlistId, long songId);
 }

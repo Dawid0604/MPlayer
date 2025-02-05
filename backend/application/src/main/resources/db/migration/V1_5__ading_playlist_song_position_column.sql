@@ -1,0 +1,1 @@
+ALTER TABLE PlaylistsSongsLinks ADD COLUMN Position INT DEFAULT 0 NOT NULL;

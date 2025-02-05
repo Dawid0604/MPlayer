@@ -43,7 +43,36 @@ class PlaylistDaoServiceImpl implements PlaylistDaoService {
         return playlistRepository.countSongsByPlaylistId(playlistId);
     }
 
-    private static SongEntity map(final Object[] song) {
+    @Override
+    public void increaseSongPosition(final long playlistId, final long songId) {
+        var songWithNeighbourSongs = playlistRepository.findSongWithNeighbourSongs(playlistId, songId);
+        List<List<Number>> swapSongs = (songWithNeighbourSongs.size() == 3) ? List.of(List.of((long) songWithNeighbourSongs.get(1)[0], (int) songWithNeighbourSongs.get(2)[1]),
+                                                                                      List.of((long) songWithNeighbourSongs.get(2)[0], (int) songWithNeighbourSongs.get(1)[1]))
+
+                                                                            : List.of(List.of((long) songWithNeighbourSongs.get(0)[0], (int) songWithNeighbourSongs.get(1)[1]),
+                                                                                      List.of((long) songWithNeighbourSongs.get(1)[0], (int) songWithNeighbourSongs.get(0)[1]));
+
+        playlistRepository.swapSongsPosition(playlistId, swapSongs);
+    }
+
+    @Override
+    public void decreaseSongPosition(final long playlistId, final long songId) {
+        var songWithNeighbourSongs = playlistRepository.findSongWithNeighbourSongs(playlistId, songId);
+        playlistRepository.swapSongsPosition(playlistId, List.of(List.of((long) songWithNeighbourSongs.get(0)[0], (int) songWithNeighbourSongs.get(1)[1]),
+                                                                 List.of((long) songWithNeighbourSongs.get(1)[0], (int) songWithNeighbourSongs.get(0)[1])));
+    }
+
+    @Override
+    @Transactional
+    public void deleteSong(final long playlistId, final long songId) {
+        var songPosition = playlistRepository.findSongPosition(playlistId, songId)
+                                             .orElseThrow();
+
+        playlistRepository.deleteSong(playlistId, songId);
+        playlistRepository.correctSongsPosition(playlistId, songPosition);
+    }
+
+    private static PlaylistSongsLinksEntity map(final Object[] song) {
         List<SongAuthorEntity> songAuthors = RegexTool.split((String) song[4], COMMA_PATTERN)
                                                       .stream()
                                                       .map(_groupedFields -> RegexTool.split(_groupedFields, COLON_PATTERN))
@@ -51,6 +80,7 @@ class PlaylistDaoServiceImpl implements PlaylistDaoService {
                                                       .map(SongAuthorEntity::new)
                                                       .toList();
 
-        return new SongEntity((String) song[0], (String) song[1], (String) song[2], (String) song[3], songAuthors);
+        var _song = new SongEntity((String) song[0], (String) song[1], (String) song[2], (String) song[3], songAuthors);
+        return new PlaylistSongsLinksEntity(_song, (int) song[5]);
     }
 }

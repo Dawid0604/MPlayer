@@ -8,6 +8,7 @@ import pl.dawid0604.mplayer.song.SongDTO;
 import pl.dawid0604.mplayer.song.SongEntity;
 import pl.dawid0604.mplayer.user.UserRestService;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static pl.dawid0604.mplayer.tools.DateFormatter.withDateFormat;
@@ -32,6 +33,21 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
         return mapDetails(playlistDaoService.getDetailsById(encryptionService.decryptId(playlistId)));
     }
 
+    @Override
+    public void increaseSongPosition(final String playlistId, final String songId) {
+        playlistDaoService.increaseSongPosition(encryptionService.decryptId(playlistId), encryptionService.decryptId(songId));
+    }
+
+    @Override
+    public void decreaseSongPosition(final String playlistId, final String songId) {
+        playlistDaoService.decreaseSongPosition(encryptionService.decryptId(playlistId), encryptionService.decryptId(songId));
+    }
+
+    @Override
+    public void deleteSong(final String playlistId, final String songId) {
+        playlistDaoService.deleteSong(encryptionService.decryptId(playlistId), encryptionService.decryptId(songId));
+    }
+
     private PlaylistDTO map(final PlaylistEntity playlistEntity) {
         return new PlaylistDTO(playlistEntity.getEncryptedId(), playlistEntity.getName(), withDateFormat(playlistEntity.getCreatedDate()),
                                playlistDaoService.countSongsByPlaylistId(encryptionService.decryptId(playlistEntity.getEncryptedId())));
@@ -40,6 +56,8 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
     private PlaylistDetailsDTO mapDetails(final PlaylistEntity playlistEntity) {
         return new PlaylistDetailsDTO(map(playlistEntity), playlistEntity.getSongs()
                                                                          .stream()
+                                                                         .sorted(Comparator.comparingInt(PlaylistSongsLinksEntity::getPosition))
+                                                                         .map(PlaylistSongsLinksEntity::getSong)
                                                                          .map(PlaylistRestServiceImpl::mapSong)
                                                                          .toList());
     }

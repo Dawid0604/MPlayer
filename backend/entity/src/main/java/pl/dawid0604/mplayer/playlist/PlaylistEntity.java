@@ -3,7 +3,6 @@ package pl.dawid0604.mplayer.playlist;
 import jakarta.persistence.*;
 import lombok.*;
 import pl.dawid0604.mplayer.EntityBase;
-import pl.dawid0604.mplayer.song.SongEntity;
 import pl.dawid0604.mplayer.user.UserEntity;
 
 import java.time.LocalDateTime;
@@ -32,12 +31,9 @@ public class PlaylistEntity extends EntityBase {
     @EqualsAndHashCode.Exclude
     private UserEntity user;
 
-    @ManyToMany
     @EqualsAndHashCode.Exclude
-    @JoinTable(name = "PlaylistsSongsLinks",
-               joinColumns = @JoinColumn(name = "PlaylistId"),
-               inverseJoinColumns = @JoinColumn(name = "SongId"))
-    private List<SongEntity> songs;
+    @OneToMany(mappedBy = "playlist", orphanRemoval = true)
+    private List<PlaylistSongsLinksEntity> songs;
 
     @SuppressWarnings("unused")
     public PlaylistEntity(final String encryptedId, final String name, final LocalDateTime createdDate) {
@@ -46,7 +42,7 @@ public class PlaylistEntity extends EntityBase {
         this.createdDate = createdDate;
     }
 
-    public void setSongs(final List<SongEntity> songs) {
+    public void setSongs(final List<PlaylistSongsLinksEntity> songs) {
         if(isEmpty(this.songs)) {
             this.songs = songs;
         }

@@ -61,6 +61,15 @@ export class PlaylistComponent implements OnInit {
           error: _sub_err => console.log(_sub_err)
     })
   }
+
+  private reloadPlaylistSongs() {
+    this.playlistService
+        .getPlaylistDetails(this.playlistDetails.playlist.encryptedId)
+        .subscribe({
+          next: _sub_res => this.playlistDetails = _sub_res,
+          error: _sub_err => console.log(_sub_err)
+    })
+  }
   
   playNextSong(audioElement: HTMLAudioElement) {
     if(this.selectedSongIndex + 1 <= this.playlistDetails.songs.length) {      
@@ -92,6 +101,47 @@ export class PlaylistComponent implements OnInit {
     
     this.selectedSongIndex = 0;
     this.selectSong(this.selectedSongIndex, this.playlistDetails.songs[0], audioElement);
+  }
+
+  increaseSongPosition(songId: string, songPosition: number) {
+    this.playlistService
+        .increaseSongPosition(this.playlistDetails.playlist.encryptedId, songId)
+        .subscribe({
+          next: _res => {
+            this.reloadPlaylistSongs();
+            this.selectedSongIndex = songPosition + 1;
+          },
+          error: _err => console.log(_err)
+        })
+  }
+
+  decreaseSongPosition(songId: string, songPosition: number) {
+    this.playlistService
+        .decreaseSongPosition(this.playlistDetails.playlist.encryptedId, songId)
+        .subscribe({
+          next: _res => {
+            this.reloadPlaylistSongs();
+            this.selectedSongIndex = songPosition - 1;
+          },
+          error: _err => console.log(_err)
+        })
+  }
+
+  deleteSong(songId: string) {
+    this.playlistService
+        .deleteSong(this.playlistDetails.playlist.encryptedId, songId)
+        .subscribe({
+          next: _res => {
+            this.reloadPlaylistSongs();
+            this.playlistService
+                .findPlaylists()
+                .subscribe({
+                  next: _res => this.playlists = _res,
+                  error: _err => console.log(_err)
+                })
+          },
+          error: _err => console.log(_err)
+        })
   }
 
   togglePlayPause(audioElement: HTMLAudioElement) {
