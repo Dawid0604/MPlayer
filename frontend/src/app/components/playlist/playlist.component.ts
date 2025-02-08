@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { faCircleArrowUp, faCircleDown, faCirclePlay, faCircleStop, faCircleUp, faClock, faEyeSlash, faFloppyDisk, faMusic, faPenToSquare, faTrash, faVolumeHigh, faVolumeLow } from '@fortawesome/free-solid-svg-icons';
+import { faCircleArrowUp, faCircleCheck, faCircleDown, faCirclePlay, faCircleStop, faCircleUp, faCircleXmark, faClock, faEyeSlash, faFloppyDisk, faMusic, faPenToSquare, faSquareCheck, faSquareXmark, faTrash, faVolumeHigh, faVolumeLow } from '@fortawesome/free-solid-svg-icons';
 import { PlaylistService } from '../../services/playlist.service';
 import { PlaylistDTO } from '../../model/PlaylistDTO';
 import { PlaylistDetailsDTO } from '../../model/PlaylistDetailsDTO';
@@ -24,6 +24,8 @@ export class PlaylistComponent implements OnInit {
   deletePlaylistIcon = faTrash;
   updatePlaylistIcon = faFloppyDisk;
   editPlaylistIcon = faPenToSquare;
+  savePlaylistIcon = faCircleCheck;
+  cancelPlaylistIcon = faCircleXmark;
 
   isPlaying = false;
   currentTime = 0;
@@ -35,6 +37,9 @@ export class PlaylistComponent implements OnInit {
   playlistDetails: PlaylistDetailsDTO = { } as PlaylistDetailsDTO;
   selectedSongIndex: number = 0;
   selectedPlaylistIndex: number = 0;
+  selectedPlaylistToEditIndex: number = 0;
+  editPlaylistMode: boolean = false;
+  form: any = { };
 
   constructor(private playlistService: PlaylistService) { }
 
@@ -66,6 +71,7 @@ export class PlaylistComponent implements OnInit {
           next: _sub_res => {
             this.playlistDetails = _sub_res
             this.currentSong = _sub_res.songs[0];
+            this.form.text = _sub_res.playlist.name;
           },
           error: _sub_err => console.log(_sub_err)
     })
@@ -110,6 +116,7 @@ export class PlaylistComponent implements OnInit {
     this.currentPlaylist = playlist;
     this.getPlaylistDetails(playlist.encryptedId);
     
+    this.form.text = playlist.name;
     this.selectedSongIndex = 0;
     this.selectSong(this.selectedSongIndex, this.playlistDetails.songs[0], audioElement);
   }
@@ -183,6 +190,24 @@ export class PlaylistComponent implements OnInit {
           next: _res => {
             this.reloadPlaylists();
             this.reloadPlaylistSongs();
+          },
+          error: _err => console.log(_err)
+        })
+  }
+
+  editPlaylist(playlist: PlaylistDTO, playlistPosition: number) {
+    this.editPlaylistMode = !this.editPlaylistMode;
+    this.selectedPlaylistToEditIndex = playlistPosition;
+    this.form.text = playlist.name;
+  }
+
+  renamePlaylist(playlistId: string) {
+    this.playlistService
+        .rename(playlistId, this.form.text)
+        .subscribe({
+          next: _res => {
+            this.reloadPlaylists();
+            this.editPlaylistMode = false;
           },
           error: _err => console.log(_err)
         })

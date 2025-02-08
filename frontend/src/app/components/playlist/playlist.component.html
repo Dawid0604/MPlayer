@@ -8,7 +8,7 @@
             <div class="player_group">
                 <div class="player_song_image" ></div>
                 <div>
-                    <strong><fa-icon [icon]="songIcon"></fa-icon>&nbsp; {{currentSong.title}}<p style="font-size: small;">{{currentSong.authors.join(', ')}}</p></strong> 
+                    <strong><fa-icon [icon]="songIcon"></fa-icon>&nbsp; {{currentSong.title}}<p style="font-size: small;" *ngIf="currentSong.authors">{{currentSong.authors.join(', ')}}</p></strong> 
                 </div>
             </div>            
             
@@ -57,25 +57,42 @@
             </header>
 
             <div class="playlist_item" *ngFor="let playlist of playlists; index as _pos" [ngClass]="(_pos === selectedPlaylistIndex) ? 'playlist_item_selected' : ''">
-                <div (click)="selectPlaylist(_pos, playlist, audioPlayer)">{{playlist.name}}</div>
-                <div (click)="selectPlaylist(_pos, playlist, audioPlayer)">{{playlist.numberOfSongs}} songs</div>                                
-                <div class="playlist_item_actions">
-                    <div>
-                        <fa-icon [icon]="editPlaylistIcon"></fa-icon>
-                    </div>
+                @if(editPlaylistMode && _pos === selectedPlaylistToEditIndex) {
+                    <form name="form" (ngSubmit)="renamePlaylist(playlist.encryptedId)" #f="ngForm">
+                        <input class="edit_playlist_input" [(ngModel)]="form.text" #text="ngModel" type="text" name="text">
+                        
+                        <div [ngClass]="(_pos === selectedPlaylistIndex) ? 'playlist_item_actions playlist_item_actions_selected' : 'playlist_item_actions'">
+                            <button (click)="editPlaylist(playlist, 0)">
+                                <fa-icon [icon]="cancelPlaylistIcon"></fa-icon>
+                            </button>
+                        
+                            <button type="submit">
+                                <fa-icon [icon]="savePlaylistIcon"></fa-icon>
+                            </button>              
+                        </div>
+                    </form>      
 
-                    <div (click)="deletePlaylist(playlist.encryptedId)">
-                        <fa-icon [icon]="deletePlaylistIcon"></fa-icon>
-                    </div>              
-                    
-                    <button [disabled]="_pos === 0" (click)="decreasePlaylistPosition(playlist.encryptedId, _pos)">
-                        <fa-icon [icon]="upIcon"></fa-icon>
-                    </button>
+                } @else {
+                    <div (click)="selectPlaylist(_pos, playlist, audioPlayer)">{{playlist.name}}</div>
+                    <div (click)="selectPlaylist(_pos, playlist, audioPlayer)">{{playlist.numberOfSongs}} songs</div>  
+                    <div [ngClass]="_pos === selectedPlaylistIndex ? 'playlist_item_actions playlist_item_actions_selected' : 'playlist_item_actions'">
+                        <button (click)="editPlaylist(playlist, _pos)">
+                            <fa-icon [icon]="editPlaylistIcon"></fa-icon>
+                        </button>
     
-                    <button [disabled]="_pos === playlists.length - 1" (click)="increasePlaylistPosition(playlist.encryptedId, _pos)">
-                        <fa-icon [icon]="downIcon"></fa-icon>
-                    </button>
-                </div>            
+                        <button (click)="deletePlaylist(playlist.encryptedId)">
+                            <fa-icon [icon]="deletePlaylistIcon"></fa-icon>
+                        </button>              
+                        
+                        <button [disabled]="_pos === 0" (click)="decreasePlaylistPosition(playlist.encryptedId, _pos)">
+                            <fa-icon [icon]="upIcon"></fa-icon>
+                        </button>
+        
+                        <button [disabled]="_pos === playlists.length - 1" (click)="increasePlaylistPosition(playlist.encryptedId, _pos)">
+                            <fa-icon [icon]="downIcon"></fa-icon>
+                        </button>
+                    </div>                                    
+                }    
             </div>
         </section>
 
@@ -87,7 +104,7 @@
             <div class="playlist_item" *ngFor="let song of playlistDetails.songs; index as _pos" [ngClass]="(_pos === selectedSongIndex) ? 'playlist_item_selected' : ''">
                 <div (click)="selectSong(_pos, song, audioPlayer)">{{_pos + 1}}</div>
                 <div class="player_song_image" (click)="selectSong(_pos, song, audioPlayer)" [style]="{ 'background-image': 'url(' + song.thumbnailPath + ')'}"></div>
-                <div (click)="selectSong(_pos, song, audioPlayer)" class="song_title_box">{{song.title}}<p style="font-size: smaller;">{{song.authors.join(', ')}}</p></div>
+                <div (click)="selectSong(_pos, song, audioPlayer)" class="song_title_box">{{song.title}}<p style="font-size: smaller;" *ngIf="song.authors">{{song.authors.join(', ')}}</p></div>
                 <div>
                     <button [disabled]="_pos === selectedSongIndex" (click)="deleteSong(song.encryptedId)">
                         <fa-icon [icon]="deletePlaylistIcon"></fa-icon>                    

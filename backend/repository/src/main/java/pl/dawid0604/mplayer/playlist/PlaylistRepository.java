@@ -146,4 +146,20 @@ public interface PlaylistRepository extends JpaRepository<PlaylistEntity, Long> 
             WHERE ps.Id IN (:#{#ids[0][0]}, :#{#ids[1][0]})
            """, nativeQuery = true)
     void swapPlaylistsPosition(List<List<Number>> ids);
+
+    @Modifying
+    @Transactional
+    @Query("""
+            UPDATE #{#entityName} p
+            SET p.name = :name
+            WHERE p.id = :playlistId
+           """)
+    void renamePlaylist(long playlistId, String name);
+
+    @Query(value = """
+                SELECT 1
+                FROM PlaylistsSongsLinks pls
+                WHERE pls.PlaylistId = :playlistId AND pls.SongId = :songId
+            """, nativeQuery = true)
+    boolean playlistSongExistsById(long playlistId, long songId);
 }

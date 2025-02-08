@@ -2,6 +2,7 @@ package pl.dawid0604.mplayer.playlist;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import pl.dawid0604.mplayer.playlist.request.PlaylistRenameRequestDTO;
 
 import java.util.List;
 
@@ -67,5 +68,11 @@ public class PlaylistRestController {
     @DeleteMapping("/{playlistId}")
     public void deletePlaylist(@PathVariable("playlistId") final String playlistId) {
         playlistRestService.deletePlaylist(playlistId);
+    }
+
+    @PatchMapping("/rename")
+    @ResponseStatus(NO_CONTENT)
+    public void renamePlaylist(@RequestBody final PlaylistRenameRequestDTO request) {
+        playlistRestService.renamePlaylist(request.encryptedId(), request.name());
     }
 }

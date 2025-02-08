@@ -18,4 +18,6 @@ public interface PlaylistRestService {
     void decreasePlaylistPosition(String playlistId);
 
     void deletePlaylist(String playlistId);
+
+    void renamePlaylist(String playlistId, String name);
 }

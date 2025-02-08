@@ -156,6 +156,10 @@ button {
     align-items: center;
 }
 
+.playlist_item_actions_selected button {
+    color: black;
+}
+
 .playlist_item_actions {
     display: flex;
     justify-content: space-between;
@@ -171,4 +175,14 @@ button {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+
+.edit_playlist_input {
+    cursor: pointer;    
+    background-color: #e9e9ed;
+    text-align: center;            
+    border: 2px solid black;    
+    outline: none;
+    border-radius: 0.5em;
+    margin: 0.5em;
 }

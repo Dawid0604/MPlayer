@@ -43,4 +43,11 @@ export class PlaylistService {
   deletePlaylist(playlistId: string): Observable<any> {
     return this.httpClient.delete(`${this.API}/${playlistId}`);
   }
+
+  rename(playlistId: string, name: string): Observable<any> {
+    return this.httpClient.patch(`${this.API}/rename`, {
+      encryptedId: playlistId,
+      name: name
+    });
+  }
 }

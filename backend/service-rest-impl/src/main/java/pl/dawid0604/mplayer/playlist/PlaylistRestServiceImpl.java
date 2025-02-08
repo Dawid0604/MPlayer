@@ -3,6 +3,7 @@ package pl.dawid0604.mplayer.playlist;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.dawid0604.mplayer.encryption.EncryptionService;
+import pl.dawid0604.mplayer.exception.ResourceNotFoundException;
 import pl.dawid0604.mplayer.song.SongAuthorEntity;
 import pl.dawid0604.mplayer.song.SongDTO;
 import pl.dawid0604.mplayer.song.SongEntity;
@@ -11,6 +12,7 @@ import pl.dawid0604.mplayer.user.UserRestService;
 import java.util.Comparator;
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static pl.dawid0604.mplayer.tools.DateFormatter.withDateFormat;
 
 @Service
@@ -45,8 +47,12 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
     }
 
     @Override
-    public void deleteSong(final String playlistId, final String songId) {
-        playlistDaoService.deleteSong(encryptionService.decryptId(playlistId), encryptionService.decryptId(songId));
+    public void deleteSong(final String encryptedPlaylistId, final String encryptedSongId) {
+        long playlistId = encryptionService.decryptId(encryptedPlaylistId);
+        long songId = encryptionService.decryptId(encryptedSongId);
+
+        throwWhenSongNotFound(playlistId, songId);
+        playlistDaoService.deleteSong(playlistId, songId);
     }
 
     @Override
@@ -60,8 +66,34 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
     }
 
     @Override
-    public void deletePlaylist(final String playlistId) {
-        playlistDaoService.deletePlaylist(encryptionService.decryptId(playlistId));
+    public void deletePlaylist(final String encryptedId) throws ResourceNotFoundException {
+        long playlistId = encryptionService.decryptId(encryptedId);
+
+        throwWhenPlaylistNotFound(playlistId);
+        playlistDaoService.deletePlaylist(playlistId);
+    }
+
+    @Override
+    public void renamePlaylist(final String encryptedId, final String name) throws ResourceNotFoundException {
+        if(isBlank(name)) {
+            throw new IllegalArgumentException("Playlist Name cannot be blank");
+        }
+
+        long playlistId = encryptionService.decryptId(encryptedId);
+        throwWhenPlaylistNotFound(playlistId);
+        playlistDaoService.renamePlaylist(playlistId, name);
+    }
+
+    private void throwWhenPlaylistNotFound(final long playlistId) throws ResourceNotFoundException {
+        if(!playlistDaoService.existsById(playlistId)) {
+            throw ResourceNotFoundException.playlistException(playlistId);
+        }
+    }
+
+    private void throwWhenSongNotFound(final long playlistId, final long songId) throws ResourceNotFoundException {
+        if(!playlistDaoService.playlistSongExistsById(playlistId, songId)) {
+            throw ResourceNotFoundException.playlistSongException(playlistId, songId);
+        }
     }
 
     private PlaylistDTO map(final PlaylistEntity playlistEntity) {

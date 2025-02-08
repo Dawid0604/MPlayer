@@ -20,4 +20,10 @@ public interface PlaylistDaoService {
     void decreasePlaylistPosition(long playlistId);
 
     void deletePlaylist(long playlistId);
+
+    void renamePlaylist(long playlistId, String name);
+
+    boolean existsById(long playlistId);
+
+    boolean playlistSongExistsById(long playlistId, long songId);
 }

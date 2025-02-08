@@ -101,6 +101,22 @@ class PlaylistDaoServiceImpl implements PlaylistDaoService {
         playlistRepository.correctPlaylistsPosition(playlistId, playlistPosition);
     }
 
+    @Override
+    @Transactional
+    public void renamePlaylist(final long playlistId, final String name) {
+        playlistRepository.renamePlaylist(playlistId, name);
+    }
+
+    @Override
+    public boolean existsById(final long playlistId) {
+        return playlistRepository.existsById(playlistId);
+    }
+
+    @Override
+    public boolean playlistSongExistsById(final long playlistId, final long songId) {
+        return playlistRepository.playlistSongExistsById(playlistId, songId);
+    }
+
     private static PlaylistSongsLinksEntity map(final Object[] song) {
         List<SongAuthorEntity> songAuthors = RegexTool.split((String) song[4], COMMA_PATTERN)
                                                       .stream()
