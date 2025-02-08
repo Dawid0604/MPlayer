@@ -50,4 +50,22 @@ public class PlaylistRestController {
 
         playlistRestService.deleteSong(playlistId, songId);
     }
+
+    @ResponseStatus(OK)
+    @PatchMapping("/{playlistId}/increase")
+    public void increasePlaylistPosition(@PathVariable("playlistId") final String playlistId) {
+        playlistRestService.increasePlaylistPosition(playlistId);
+    }
+
+    @ResponseStatus(OK)
+    @PatchMapping("/{playlistId}/decrease")
+    public void decreasePlaylistPosition(@PathVariable("playlistId") final String playlistId) {
+        playlistRestService.decreasePlaylistPosition(playlistId);
+    }
+
+    @ResponseStatus(NO_CONTENT)
+    @DeleteMapping("/{playlistId}")
+    public void deletePlaylist(@PathVariable("playlistId") final String playlistId) {
+        playlistRestService.deletePlaylist(playlistId);
+    }
 }

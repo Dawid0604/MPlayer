@@ -13,14 +13,14 @@ import java.util.Optional;
 public interface PlaylistRepository extends JpaRepository<PlaylistEntity, Long> {
 
     @Query("""
-            SELECT new pl.dawid0604.mplayer.playlist.PlaylistEntity(p.encryptedId, p.name, p.createdDate)
+            SELECT new pl.dawid0604.mplayer.playlist.PlaylistEntity(p.encryptedId, p.name, p.createdDate, p.position)
             FROM #{#entityName} p
             WHERE p.user.id = :loggedUserId
             """)
     List<PlaylistEntity> findUserPlaylists(long loggedUserId);
 
     @Query("""
-            SELECT new pl.dawid0604.mplayer.playlist.PlaylistEntity(p.encryptedId, p.name, p.createdDate)
+            SELECT new pl.dawid0604.mplayer.playlist.PlaylistEntity(p.encryptedId, p.name, p.createdDate, p.position)
             FROM #{#entityName} p
             WHERE p.id = :playlistId
            """)
@@ -49,7 +49,7 @@ public interface PlaylistRepository extends JpaRepository<PlaylistEntity, Long> 
     long countSongsByPlaylistId(long playlistId);
 
     @Query(value = """
-                SELECT pls.songId, pls.position
+                SELECT pls.SongId, pls.Position
                 FROM PlaylistsSongsLinks pls
                 WHERE pls.PlaylistId = :playlistId AND
                       pls.Position IN (
@@ -97,4 +97,53 @@ public interface PlaylistRepository extends JpaRepository<PlaylistEntity, Long> 
                       psl.Position > :position
             """, nativeQuery = true)
     void correctSongsPosition(long playlistId, int position);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            DELETE FROM Playlists
+            WHERE Id = :playlistId
+           """, nativeQuery = true)
+    void deletePlaylist(long playlistId);
+
+    @Query(value = """
+                SELECT pl.Position
+                FROM Playlists pl
+                WHERE pl.Id = :playlistId
+            """, nativeQuery = true)
+    Optional<Integer> findPlaylistPosition(long playlistId);
+
+    @Query(value = """
+                UPDATE Playlists as pl
+                SET psl.Position = pl.Position - 1
+                WHERE pl.Id = :playlistId AND
+                      pl.Position > :position
+            """, nativeQuery = true)
+    void correctPlaylistsPosition(long playlistId, int position);
+
+
+    @Query(value = """
+                SELECT pl.Id, pl.Position
+                FROM Playlists pl
+                WHERE pl.Position IN (
+                        SELECT sub_pl.Position - 1 FROM Playlists sub_pl WHERE sub_pl.Id = :playlistId
+                        UNION
+                        SELECT sub_pl.Position FROM Playlists sub_pl WHERE sub_pl.Id = :playlistId
+                        UNION
+                        SELECT sub_pl.Position + 1 FROM Playlists sub_pl WHERE sub_pl.Id = :playlistId
+                      ) ORDER BY pl.Position
+           """, nativeQuery = true)
+    List<Object[]> findPlaylistWithNeighbourPlaylists(long playlistId);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            UPDATE Playlists as ps
+            SET ps.position = CASE
+                WHEN ps.Id = :#{#ids[0][0]} THEN :#{#ids[0][1]}
+                WHEN ps.Id = :#{#ids[1][0]} THEN :#{#ids[1][1]}
+            END
+            WHERE ps.Id IN (:#{#ids[0][0]}, :#{#ids[1][0]})
+           """, nativeQuery = true)
+    void swapPlaylistsPosition(List<List<Number>> ids);
 }

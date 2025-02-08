@@ -72,6 +72,35 @@ class PlaylistDaoServiceImpl implements PlaylistDaoService {
         playlistRepository.correctSongsPosition(playlistId, songPosition);
     }
 
+    @Override
+    public void increasePlaylistPosition(final long playlistId) {
+        var playlistWithNeighbourPlaylists = playlistRepository.findPlaylistWithNeighbourPlaylists(playlistId);
+        List<List<Number>> swapPlaylists = (playlistWithNeighbourPlaylists.size() == 3) ? List.of(List.of((long) playlistWithNeighbourPlaylists.get(1)[0], (int) playlistWithNeighbourPlaylists.get(2)[1]),
+                                                                                                  List.of((long) playlistWithNeighbourPlaylists.get(2)[0], (int) playlistWithNeighbourPlaylists.get(1)[1]))
+
+                                                                                        : List.of(List.of((long) playlistWithNeighbourPlaylists.get(0)[0], (int) playlistWithNeighbourPlaylists.get(1)[1]),
+                                                                                                  List.of((long) playlistWithNeighbourPlaylists.get(1)[0], (int) playlistWithNeighbourPlaylists.get(0)[1]));
+
+        playlistRepository.swapPlaylistsPosition(swapPlaylists);
+    }
+
+    @Override
+    public void decreasePlaylistPosition(final long playlistId) {
+        var playlistWithNeighbourPlaylists = playlistRepository.findPlaylistWithNeighbourPlaylists(playlistId);
+        playlistRepository.swapPlaylistsPosition(List.of(List.of((long) playlistWithNeighbourPlaylists.get(0)[0], (int) playlistWithNeighbourPlaylists.get(1)[1]),
+                                                         List.of((long) playlistWithNeighbourPlaylists.get(1)[0], (int) playlistWithNeighbourPlaylists.get(0)[1])));
+    }
+
+    @Override
+    @Transactional
+    public void deletePlaylist(final long playlistId) {
+        var playlistPosition = playlistRepository.findPlaylistPosition(playlistId)
+                                                 .orElseThrow();
+
+        playlistRepository.deletePlaylist(playlistId);
+        playlistRepository.correctPlaylistsPosition(playlistId, playlistPosition);
+    }
+
     private static PlaylistSongsLinksEntity map(final Object[] song) {
         List<SongAuthorEntity> songAuthors = RegexTool.split((String) song[4], COMMA_PATTERN)
                                                       .stream()

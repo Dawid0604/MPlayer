@@ -14,4 +14,10 @@ public interface PlaylistDaoService {
     void decreaseSongPosition(long playlistId, long songId);
 
     void deleteSong(long playlistId, long songId);
+    
+    void increasePlaylistPosition(long playlistId);
+
+    void decreasePlaylistPosition(long playlistId);
+
+    void deletePlaylist(long playlistId);
 }

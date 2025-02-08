@@ -50,6 +50,15 @@ export class PlaylistComponent implements OnInit {
         })
   }
 
+  private reloadPlaylists() {
+    this.playlistService
+        .findPlaylists()
+        .subscribe({
+          next: _res => this.playlists = _res,
+          error: _err => console.log(_err)
+        })
+  }
+
   private getPlaylistDetails(playlistId: string) {
     this.playlistService
         .getPlaylistDetails(playlistId)
@@ -72,11 +81,13 @@ export class PlaylistComponent implements OnInit {
   }
   
   playNextSong(audioElement: HTMLAudioElement) {
-    if(this.selectedSongIndex + 1 <= this.playlistDetails.songs.length) {      
+    if(this.selectedSongIndex + 1 <= this.playlistDetails.songs.length - 1) {      
       this.selectSong(this.selectedSongIndex += 1, this.playlistDetails.songs[this.selectedSongIndex], audioElement);
 
     } else {
       this.selectedSongIndex = 0;
+      const firstSong = this.playlistDetails.songs[0];
+      this.selectSong(this.selectedSongIndex, firstSong, audioElement);
     }
   }
 
@@ -132,13 +143,46 @@ export class PlaylistComponent implements OnInit {
         .deleteSong(this.playlistDetails.playlist.encryptedId, songId)
         .subscribe({
           next: _res => {
+            this.reloadPlaylists();
+            this.reloadPlaylistSongs();                        
+          },
+          error: _err => console.log(_err)
+        })
+  }
+
+  increasePlaylistPosition(playlistId: string, playlistPosition: number) {
+    this.playlistService
+        .increasePlaylistPosition(playlistId)
+        .subscribe({
+          next: _res => {
+            this.reloadPlaylists();
             this.reloadPlaylistSongs();
-            this.playlistService
-                .findPlaylists()
-                .subscribe({
-                  next: _res => this.playlists = _res,
-                  error: _err => console.log(_err)
-                })
+            this.selectedPlaylistIndex = playlistPosition + 1;
+          },
+          error: _err => console.log(_err)
+        })
+  }
+
+  decreasePlaylistPosition(playlistId: string, playlistPosition: number) {
+    this.playlistService
+        .decreasePlaylistPosition(playlistId)
+        .subscribe({
+          next: _res => {
+            this.reloadPlaylists();
+            this.reloadPlaylistSongs();
+            this.selectedPlaylistIndex = playlistPosition - 1;
+          },
+          error: _err => console.log(_err)
+        })
+  }
+
+  deletePlaylist(playlistId: string) {
+    this.playlistService
+        .deletePlaylist(playlistId)
+        .subscribe({
+          next: _res => {
+            this.reloadPlaylists();
+            this.reloadPlaylistSongs();
           },
           error: _err => console.log(_err)
         })

@@ -31,15 +31,21 @@ public class PlaylistEntity extends EntityBase {
     @EqualsAndHashCode.Exclude
     private UserEntity user;
 
+    @Column(name = "Position")
+    private int position;
+
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "playlist", orphanRemoval = true)
     private List<PlaylistSongsLinksEntity> songs;
 
     @SuppressWarnings("unused")
-    public PlaylistEntity(final String encryptedId, final String name, final LocalDateTime createdDate) {
+    public PlaylistEntity(final String encryptedId, final String name, final LocalDateTime createdDate,
+                          final int position) {
+
         super(encryptedId);
         this.name = name;
         this.createdDate = createdDate;
+        this.position = position;
     }
 
     public void setSongs(final List<PlaylistSongsLinksEntity> songs) {

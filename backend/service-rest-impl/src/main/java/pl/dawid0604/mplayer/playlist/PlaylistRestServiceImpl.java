@@ -24,6 +24,7 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
     public List<PlaylistDTO> findUserPlaylists() {
         return playlistDaoService.findUserPlaylists(userRestService.getLoggedUserId())
                                  .stream()
+                                 .sorted(Comparator.comparingInt(PlaylistEntity::getPosition))
                                  .map(this::map)
                                  .toList();
     }
@@ -46,6 +47,21 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
     @Override
     public void deleteSong(final String playlistId, final String songId) {
         playlistDaoService.deleteSong(encryptionService.decryptId(playlistId), encryptionService.decryptId(songId));
+    }
+
+    @Override
+    public void increasePlaylistPosition(final String playlistId) {
+        playlistDaoService.increasePlaylistPosition(encryptionService.decryptId(playlistId));
+    }
+
+    @Override
+    public void decreasePlaylistPosition(final String playlistId) {
+        playlistDaoService.decreasePlaylistPosition(encryptionService.decryptId(playlistId));
+    }
+
+    @Override
+    public void deletePlaylist(final String playlistId) {
+        playlistDaoService.deletePlaylist(encryptionService.decryptId(playlistId));
     }
 
     private PlaylistDTO map(final PlaylistEntity playlistEntity) {

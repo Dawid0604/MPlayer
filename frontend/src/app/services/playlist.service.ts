@@ -31,4 +31,16 @@ export class PlaylistService {
   deleteSong(playlistId: string, songId: string): Observable<any> {
     return this.httpClient.delete(`${this.API}/${playlistId}/${songId}`);
   }
+
+  increasePlaylistPosition(playlistId: string): Observable<any> {
+    return this.httpClient.patch(`${this.API}/${playlistId}/increase`, { });
+  }
+
+  decreasePlaylistPosition(playlistId: string): Observable<any> {
+    return this.httpClient.patch(`${this.API}/${playlistId}/decrease`, { });
+  }
+
+  deletePlaylist(playlistId: string): Observable<any> {
+    return this.httpClient.delete(`${this.API}/${playlistId}`);
+  }
 }

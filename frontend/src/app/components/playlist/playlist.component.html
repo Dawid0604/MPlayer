@@ -25,7 +25,7 @@
                 <input type="range" class="seek-bar" [value]="audioPlayer.currentTime" (input)="seekAudio(audioPlayer, $event)" [max]="audioPlayer.duration" />               
             </div>                        
             
-            <div class="volume-control player_group">            
+            <div class="volume-control player_group">
                 <label for="volume">
                     @if(volume < 1) {
                         <fa-icon [icon]="volumeLowIcon"></fa-icon>
@@ -53,16 +53,7 @@
     <aside id="aside_box">
         <section class="playlist_content">
             <header>
-                <h3>Playlists</h3>
-                <div class="playlist_controls">
-                    <button>
-                        <fa-icon [icon]="upIcon"></fa-icon>                     
-                    </button>
-    
-                    <button>
-                        <fa-icon [icon]="downIcon"></fa-icon>                    
-                    </button>
-                </div>            
+                <h3>Playlists</h3>                     
             </header>
 
             <div class="playlist_item" *ngFor="let playlist of playlists; index as _pos" [ngClass]="(_pos === selectedPlaylistIndex) ? 'playlist_item_selected' : ''">
@@ -73,9 +64,17 @@
                         <fa-icon [icon]="editPlaylistIcon"></fa-icon>
                     </div>
 
-                    <div>
+                    <div (click)="deletePlaylist(playlist.encryptedId)">
                         <fa-icon [icon]="deletePlaylistIcon"></fa-icon>
-                    </div>                
+                    </div>              
+                    
+                    <button [disabled]="_pos === 0" (click)="decreasePlaylistPosition(playlist.encryptedId, _pos)">
+                        <fa-icon [icon]="upIcon"></fa-icon>
+                    </button>
+    
+                    <button [disabled]="_pos === playlists.length - 1" (click)="increasePlaylistPosition(playlist.encryptedId, _pos)">
+                        <fa-icon [icon]="downIcon"></fa-icon>
+                    </button>
                 </div>            
             </div>
         </section>
@@ -83,15 +82,6 @@
         <section class="playlist_content">
             <header>
                 <h3>Playlist songs</h3>
-                <div class="playlist_controls">
-                    <button>
-                        <fa-icon [icon]="upIcon"></fa-icon>                     
-                    </button>
-    
-                    <button>
-                        <fa-icon [icon]="downIcon"></fa-icon>                    
-                    </button>
-                </div>     
             </header>
 
             <div class="playlist_item" *ngFor="let song of playlistDetails.songs; index as _pos" [ngClass]="(_pos === selectedSongIndex) ? 'playlist_item_selected' : ''">
