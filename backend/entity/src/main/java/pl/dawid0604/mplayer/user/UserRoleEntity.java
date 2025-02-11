@@ -24,6 +24,11 @@ public class UserRoleEntity extends EntityBase {
     @OneToMany(mappedBy = "role", orphanRemoval = true)
     private List<UserEntity> users;
 
+    public UserRoleEntity(final long id, final String name) {
+        super(id);
+        this.name = name;
+    }
+
     public UserRoleEntity(final String name) {
         this.name = name;
     }

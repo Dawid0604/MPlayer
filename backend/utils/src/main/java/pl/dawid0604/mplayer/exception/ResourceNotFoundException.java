@@ -16,4 +16,8 @@ public class ResourceNotFoundException extends RuntimeException {
     public static ResourceNotFoundException playlistSongException(final long playlistId, final long songId) {
         return new ResourceNotFoundException("Pair[Playlist[Id=" + playlistId + "], Song[Id=" + songId + "]] not found");
     }
+
+    public static ResourceNotFoundException userRoleException(final String role) {
+        return new ResourceNotFoundException("UserRole[Role='" + role + "'] not found");
+    }
 }

@@ -5,6 +5,7 @@ import { DiscoverSongsDTO, Pageable, SongDTO } from '../../model/DiscoverSongsDT
 import { SongService } from '../../services/song.service';
 import { SongMoodDTO } from '../../model/SongMoodDTO';
 import { SongGenreDTO } from '../../model/SongGenreDTO';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-discover',
@@ -42,28 +43,41 @@ export class DiscoverComponent implements OnInit {
   searchedText: string = "";
   form: any = { };
  
-  constructor(private songService: SongService) { }
+  constructor(private songService: SongService,
+              private toastrService: ToastrService) { }
  
   ngOnInit(): void {
     this.songService
         .discoverSongs(0, this.searchedText, this.selectedSongGenres, this.selectedSongMoods)
         .subscribe({
           next: _res => this.discoveredSongs = _res,
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
 
     this.songService
         .findGenres()
         .subscribe({
           next: _res => this.songGenres = _res,
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
 
     this.songService
         .findMoods()
         .subscribe({
           next: _res => this.songMoods = _res,
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
     })
   }
 
@@ -72,7 +86,11 @@ export class DiscoverComponent implements OnInit {
         .discoverSongs(pageNumber, this.searchedText, this.selectedSongGenres, this.selectedSongMoods)
         .subscribe({
           next: _res => this.discoveredSongs = _res,
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
   }
 
@@ -133,7 +151,11 @@ export class DiscoverComponent implements OnInit {
         .discoverSongs(this.discoveredSongs.pageable.pageNumber, this.searchedText, this.selectedSongGenres, this.selectedSongMoods)
         .subscribe({
           next: _res => this.discoveredSongs = _res,
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
   }
 
@@ -178,7 +200,11 @@ export class DiscoverComponent implements OnInit {
         this.songService.handleSongListening(this.currentSong.encryptedId)
                         .subscribe({
                           next: _res => { },
-                          error: _err => console.log(_err)
+                          error: _err => {
+                            if(_err['Message']) {
+                              this.toastrService.error(_err['Message'])
+                            }
+                          }
                         })
     }
     

@@ -12,6 +12,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { RequestInterceptor } from './interceptor/request.interceptor';
 import { CookieService } from 'ngx-cookie-service';
+import { WelcomeComponent } from './components/welcome/welcome.component';
+import { ToastrModule, ToastNoAnimation, ToastNoAnimationModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -19,13 +21,18 @@ import { CookieService } from 'ngx-cookie-service';
     HomeComponent,
     NavbarComponent,
     PlaylistComponent,
-    DiscoverComponent
+    DiscoverComponent,
+    WelcomeComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    ToastNoAnimationModule.forRoot({
+      positionClass: 'toast-bottom-right',
+      preventDuplicates: true
+    })
   ],
   providers: [
     CookieService,

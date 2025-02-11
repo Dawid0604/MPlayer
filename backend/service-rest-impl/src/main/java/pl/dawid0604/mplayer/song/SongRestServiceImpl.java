@@ -3,6 +3,7 @@ package pl.dawid0604.mplayer.song;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.dawid0604.mplayer.encryption.EncryptionService;
+import pl.dawid0604.mplayer.exception.ResourceNotFoundException;
 import pl.dawid0604.mplayer.tools.DateFormatter;
 
 @Service
@@ -28,7 +29,9 @@ class SongRestServiceImpl implements SongRestService {
 
     @Override
     public void handleSongListening(final String encryptedId) {
-        songDaoService.handleSongListening(encryptionService.decryptId(encryptedId));
+        long songId = encryptionService.decryptId(encryptedId);
+        throwWhenSongNotFound(songId);
+        songDaoService.handleSongListening(songId);
     }
 
     @Override
@@ -77,5 +80,11 @@ class SongRestServiceImpl implements SongRestService {
         return new DiscoverSongsDTO.SongDTO(songEntity.getEncryptedId(), songEntity.getTitle(), authors, genres, moods,
                                          songEntity.getThumbnailPath(), DateFormatter.withDateFormat(songEntity.getReleaseDate()),
                                          songEntity.getSoundLink());
+    }
+
+    private void throwWhenSongNotFound(final long songId) throws ResourceNotFoundException {
+        if(!songDaoService.existsById(songId)) {
+            throw ResourceNotFoundException.songException(songId);
+        }
     }
 }

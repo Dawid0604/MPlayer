@@ -2,6 +2,7 @@ package pl.dawid0604.mplayer.user;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import pl.dawid0604.mplayer.EntityBase;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Entity
 @Getter
+@SuperBuilder
 @Setter(PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor

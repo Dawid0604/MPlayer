@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { faCirclePlay, faCircleStop, faClock, faEyeSlash, faVolumeHigh, faVolumeLow, faVolumeOff } from '@fortawesome/free-solid-svg-icons';
 import { SongService } from '../../services/song.service';
 import { SongDTO, WelcomeSongsDTO } from '../../model/WelcomeSongsDTO';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-home',
@@ -26,14 +27,19 @@ export class HomeComponent implements OnInit {
   welcomeSongs: WelcomeSongsDTO = { } as WelcomeSongsDTO;
   currentSong : SongDTO = { } as SongDTO;
 
-  constructor(private songService: SongService) { }
+  constructor(private songService: SongService,
+              private toastrService:ToastrService) { }
 
   ngOnInit(): void {
     this.songService
         .findWelcomeSongs()
         .subscribe({
           next: _res => this.welcomeSongs = _res,
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
   }
 
@@ -70,7 +76,11 @@ export class HomeComponent implements OnInit {
         this.songService.handleSongListening(this.currentSong.encryptedId)
                         .subscribe({
                           next: _res => { },
-                          error: _err => console.log(_err)
+                          error: _err => {
+                            if(_err['Message']) {
+                              this.toastrService.error(_err['Message'])
+                            }
+                          }
                         })
     }
     

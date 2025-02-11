@@ -1,21 +1,28 @@
-<nav>
-    <div class="nav-item" [routerLink]="[ '' ]">
-        <p>MPlayer</p>
-    </div>
+<nav>    
+    @if(isUserLogged) {
+        <div class="nav-item" [routerLink]="[ '' ]">
+            <p>MPlayer</p>
+        </div>
+    
+        <div class="nav-item" [routerLink]="[ 'discover' ]">
+            <p>Discover</p>
+        </div>
+    
+        <div class="nav-item" [routerLink]="[ 'playlist' ]">
+            <p>Playlists</p>
+        </div>
+    
+        <div class="nav-item">
+            <p>Johny Kalesony</p>
+        </div>
 
-    <div class="nav-item" [routerLink]="[ 'discover' ]">
-        <p>Discover</p>
-    </div>
+        <div class="nav-item" (click)="logout()">
+            <p>Logout</p>
+        </div>
 
-    <div class="nav-item" [routerLink]="[ 'playlist' ]">
-        <p>Playlists</p>
-    </div>
-
-    <div class="nav-item">
-        <p>Johny Kalesony</p>
-    </div>
-
-    <div class="nav-item">
-        <p>Logout</p>
-    </div>
+    } @else {
+        <div class="nav-item">
+            <p>MPlayer</p>
+        </div>
+    }    
 </nav>

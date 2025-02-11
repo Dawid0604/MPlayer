@@ -22,4 +22,20 @@ class UserDaoServiceImpl implements UserDaoService {
     public Optional<Long> findIdByUsername(final String username) {
         return userRepository.findIdByUsername(username);
     }
+
+    @Override
+    public boolean existsByUsername(final String username) {
+        return userRepository.existsByUsernameIgnoreCase(username);
+    }
+
+    @Override
+    public boolean existsByNickname(final String nickname) {
+        return userRepository.existsByNicknameIgnoreCase(nickname);
+    }
+
+    @Override
+    @Transactional
+    public UserEntity save(final UserEntity entity) {
+        return userRepository.save(entity);
+    }
 }

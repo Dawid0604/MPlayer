@@ -1,0 +1,86 @@
+main {
+    width: 100vw;
+    height: 95vh;
+    padding: 1em;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+main > section {
+    width: 48%;
+    height: 65%;
+}
+
+main > section:first-child {
+    border-right: 0.125em solid white;
+}
+
+section > form {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    height: 15%;
+}
+
+.group > * {
+    width: 30%;
+    height: 25%;
+    text-align: center;
+}
+
+.group > *:not(button) {
+    text-align: left;
+}
+
+.group input {
+    cursor: pointer;
+}
+
+#logging_submit {
+    outline: none;
+    color: white;
+    text-shadow: 1px 1px 1px solid black;
+    border-color: #51a351;
+    background-color: #51a351;
+    height: 30%;
+}
+
+#logging_submit:hover {
+    transition-duration: 500ms;
+    border-color: #5fc75f;
+    background-color: #5fc75f;
+}
+
+#registation_submit {
+    outline: none;
+    color: white;
+    text-shadow: 1px 1px 1px solid black;
+    border-color: #f89406;
+    background-color: #f89406;
+    height: 30%;
+}
+
+#registation_submit:hover {
+    transition-duration: 500ms;
+    border-color: #f8a025;
+    background-color: #f8a025;
+}
+
+.form_warning {
+    color: rgb(244, 48, 48);
+    font-size: small;
+    margin: 0.1em;
+}

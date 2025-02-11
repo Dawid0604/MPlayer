@@ -144,6 +144,11 @@ class SongDaoServiceImpl implements SongDaoService {
     }
 
     @Override
+    public boolean existsById(final long songId) {
+        return songRepository.existsById(songId);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     @SuppressWarnings("unchecked")
     public PageImpl<SongEntity> discover(final String searchedText, final List<String> genres,

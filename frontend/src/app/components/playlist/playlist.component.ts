@@ -4,6 +4,7 @@ import { PlaylistService } from '../../services/playlist.service';
 import { PlaylistDTO } from '../../model/PlaylistDTO';
 import { PlaylistDetailsDTO } from '../../model/PlaylistDetailsDTO';
 import { SongDTO } from '../../model/WelcomeSongsDTO';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-playlist',
@@ -41,7 +42,8 @@ export class PlaylistComponent implements OnInit {
   editPlaylistMode: boolean = false;
   form: any = { };
 
-  constructor(private playlistService: PlaylistService) { }
+  constructor(private playlistService: PlaylistService,
+              private toastrService: ToastrService) { }
 
   ngOnInit(): void {
     this.playlistService
@@ -51,7 +53,11 @@ export class PlaylistComponent implements OnInit {
             this.playlists = _res;
             this.getPlaylistDetails(_res[0].encryptedId)
           },
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
   }
 
@@ -60,7 +66,11 @@ export class PlaylistComponent implements OnInit {
         .findPlaylists()
         .subscribe({
           next: _res => this.playlists = _res,
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
   }
 
@@ -68,12 +78,16 @@ export class PlaylistComponent implements OnInit {
     this.playlistService
         .getPlaylistDetails(playlistId)
         .subscribe({
-          next: _sub_res => {
-            this.playlistDetails = _sub_res
-            this.currentSong = _sub_res.songs[0];
-            this.form.text = _sub_res.playlist.name;
+          next: _res => {
+            this.playlistDetails = _res
+            this.currentSong = _res.songs[0];
+            this.form.text = _res.playlist.name;
           },
-          error: _sub_err => console.log(_sub_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
     })
   }
 
@@ -81,8 +95,12 @@ export class PlaylistComponent implements OnInit {
     this.playlistService
         .getPlaylistDetails(this.playlistDetails.playlist.encryptedId)
         .subscribe({
-          next: _sub_res => this.playlistDetails = _sub_res,
-          error: _sub_err => console.log(_sub_err)
+          next: _res => this.playlistDetails = _res,
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
     })
   }
   
@@ -127,9 +145,16 @@ export class PlaylistComponent implements OnInit {
         .subscribe({
           next: _res => {
             this.reloadPlaylistSongs();
-            this.selectedSongIndex = songPosition + 1;
+
+            if(this.currentSong.encryptedId === songId) {
+              this.selectedSongIndex = songPosition + 1;
+            }
           },
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
   }
 
@@ -139,9 +164,16 @@ export class PlaylistComponent implements OnInit {
         .subscribe({
           next: _res => {
             this.reloadPlaylistSongs();
-            this.selectedSongIndex = songPosition - 1;
+
+            if(this.currentSong.encryptedId === songId) {
+              this.selectedSongIndex = songPosition - 1;
+            }
           },
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
   }
 
@@ -153,7 +185,11 @@ export class PlaylistComponent implements OnInit {
             this.reloadPlaylists();
             this.reloadPlaylistSongs();                        
           },
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
   }
 
@@ -166,7 +202,11 @@ export class PlaylistComponent implements OnInit {
             this.reloadPlaylistSongs();
             this.selectedPlaylistIndex = playlistPosition + 1;
           },
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
   }
 
@@ -179,7 +219,11 @@ export class PlaylistComponent implements OnInit {
             this.reloadPlaylistSongs();
             this.selectedPlaylistIndex = playlistPosition - 1;
           },
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
   }
 
@@ -191,7 +235,11 @@ export class PlaylistComponent implements OnInit {
             this.reloadPlaylists();
             this.reloadPlaylistSongs();
           },
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
   }
 
@@ -209,7 +257,11 @@ export class PlaylistComponent implements OnInit {
             this.reloadPlaylists();
             this.editPlaylistMode = false;
           },
-          error: _err => console.log(_err)
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
         })
   }
 

@@ -1,0 +1,76 @@
+<main>
+    <section id="login_side">
+        <form #loggingForm="ngForm" (ngSubmit)="loginUser()">
+            <div class="group">
+                <h1>
+                    <fa-icon [icon]="loggingIcon"></fa-icon>
+                    Logging
+                </h1>
+            </div>
+
+            <div class="group">
+                <label for="username">Username</label>
+                <input name="username" minlength="1" required [(ngModel)]="loggingFormData.username">
+
+                <span *ngIf="loggingForm.controls['username']?.invalid && loggingForm.controls['username']?.touched" class="form_warning">
+                    Username length must be greater than 6 characters
+                </span>
+            </div>            
+
+            <div class="group">
+                <label for="password">Password</label>
+                <input name="password" minlength="1" required [(ngModel)]="loggingFormData.password" type="password">
+
+                <span *ngIf="loggingForm.controls['password']?.invalid && loggingForm.controls['password']?.touched" class="form_warning">
+                    Password length must be greater than 6 characters
+                </span>
+            </div>
+
+            <div class="group">
+                <button id="logging_submit" type="submit" [disabled]="loggingForm.invalid">Log in</button>
+            </div>
+        </form>
+    </section>
+
+    <section id="registration_side">
+        <form #registerForm="ngForm" (ngSubmit)="registerUser(registerForm)">
+            <div class="group">
+                <h1>
+                    <fa-icon [icon]="registrationIcon"></fa-icon>
+                    Registration
+                </h1>
+            </div>
+
+            <div class="group">
+                <label for="username">Username</label>
+                <input name="username" minlength="6" required [(ngModel)]="registerFormData.username">
+
+                <span *ngIf="registerForm.controls['username']?.invalid && registerForm.controls['username']?.touched" class="form_warning">
+                    Username length must be greater than 6 characters
+                </span>
+            </div>            
+
+            <div class="group">
+                <label for="password">Password</label>
+                <input name="password" minlength="6" required [(ngModel)]="registerFormData.password" type="password">
+
+                <span *ngIf="registerForm.controls['password']?.invalid && registerForm.controls['password']?.touched" class="form_warning">
+                    Password length must be greater than 6 characters
+                </span>
+            </div>
+
+            <div class="group">
+                <label for="nickname">Nickname</label>
+                <input name="nickname" minlength="6" required [(ngModel)]="registerFormData.nickname">
+
+                <span *ngIf="registerForm.controls['nickname']?.invalid && registerForm.controls['nickname']?.touched" class="form_warning">
+                    Nickname must be greater than 6 characters
+                </span>
+            </div>  
+
+            <div class="group">
+                <button id="registation_submit" type="submit" [disabled]="registerForm.invalid">Register</button>
+            </div>      
+        </form>
+    </section>
+</main>

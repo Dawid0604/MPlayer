@@ -19,4 +19,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     @Query("SELECT u.id FROM #{#entityName} u WHERE u.username = :username")
     Optional<Long> findIdByUsername(String username);
+
+    boolean existsByUsernameIgnoreCase(String username);
+
+    boolean existsByNicknameIgnoreCase(String nickname);
 }

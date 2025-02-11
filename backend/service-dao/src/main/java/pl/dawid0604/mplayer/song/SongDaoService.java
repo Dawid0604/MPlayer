@@ -13,4 +13,6 @@ public interface SongDaoService {
 
     PageImpl<SongEntity> discover(String searchedText, List<String> genres,
                                   List<String> moods, int pageNumber, int pageSize);
+
+    boolean existsById(long songId);
 }
