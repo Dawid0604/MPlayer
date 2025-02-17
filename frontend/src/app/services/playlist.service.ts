@@ -50,4 +50,10 @@ export class PlaylistService {
       name: name
     });
   }
+
+  create(playlistName: string): Observable<any> {
+    return this.httpClient.post<any>(`${this.API}/create`, {
+      name: playlistName
+    })
+  }
 }
