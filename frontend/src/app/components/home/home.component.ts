@@ -34,7 +34,14 @@ export class HomeComponent implements OnInit {
     this.songService
         .findWelcomeSongs()
         .subscribe({
-          next: _res => this.welcomeSongs = _res,
+          next: _res => {
+            if(_res.popular.length > 0 || _res.recentReleases.length > 0) {
+              this.welcomeSongs = _res
+
+            } else {
+              this.toastrService.warning("Not found songs");
+            }
+          },
           error: _err => {
             if(_err['Message']) {
               this.toastrService.error(_err['Message'])

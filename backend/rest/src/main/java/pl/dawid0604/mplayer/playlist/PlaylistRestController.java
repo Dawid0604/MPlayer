@@ -2,12 +2,12 @@ package pl.dawid0604.mplayer.playlist;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import pl.dawid0604.mplayer.playlist.request.PlaylistCreateRequestDTO;
 import pl.dawid0604.mplayer.playlist.request.PlaylistRenameRequestDTO;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 import static pl.dawid0604.mplayer.constants.AppConstants.API_PATH;
 
 @RestController
@@ -74,5 +74,11 @@ public class PlaylistRestController {
     @ResponseStatus(NO_CONTENT)
     public void renamePlaylist(@RequestBody final PlaylistRenameRequestDTO request) {
         playlistRestService.renamePlaylist(request.encryptedId(), request.name());
+    }
+
+    @PostMapping("/create")
+    @ResponseStatus(CREATED)
+    public void createPlaylist(@RequestBody final PlaylistCreateRequestDTO request) {
+        playlistRestService.createPlaylist(request.name());
     }
 }

@@ -162,4 +162,19 @@ public interface PlaylistRepository extends JpaRepository<PlaylistEntity, Long> 
                 WHERE pls.PlaylistId = :playlistId AND pls.SongId = :songId
             """, nativeQuery = true)
     boolean playlistSongExistsById(long playlistId, long songId);
+
+    @Query("""
+            SELECT CASE WHEN COUNT(p) > 0 THEN TRUE ELSE FALSE END
+            FROM #{#entityName} p
+            WHERE p.user.id = :userId AND UPPER(p.name) = UPPER(:playlistName)
+           """)
+    boolean playlistNameExistsByUser(long userId, String playlistName);
+
+    @Query("""
+            SELECT MAX(p.position)
+            FROM #{#entityName} p
+            WHERE p.user.id = :userId
+            ORDER BY p.position DESC
+           """)
+    Optional<Integer> findLastPlaylistPosition(long userId);
 }

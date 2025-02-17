@@ -1,23 +1,23 @@
 <nav>    
     @if(isUserLogged) {
-        <div class="nav-item" [routerLink]="[ '' ]">
-            <p>MPlayer</p>
+        <div class="nav-item" [routerLink]="[ '' ]">            
+            <p><fa-icon [icon]="homeIcon"></fa-icon>&nbsp;MPlayer</p>
         </div>
     
         <div class="nav-item" [routerLink]="[ 'discover' ]">
-            <p>Discover</p>
+            <p><fa-icon [icon]="discoverIcon"></fa-icon>&nbsp;Discover</p>
         </div>
     
         <div class="nav-item" [routerLink]="[ 'playlist' ]">
-            <p>Playlists</p>
+            <p><fa-icon [icon]="playlistIcon"></fa-icon>&nbsp;Playlists</p>
         </div>
     
         <div class="nav-item">
-            <p>Johny Kalesony</p>
+            <p><fa-icon [icon]="userIcon"></fa-icon>&nbsp;User</p>
         </div>
 
         <div class="nav-item" (click)="logout()">
-            <p>Logout</p>
+            <p><fa-icon [icon]="logoutIcon"></fa-icon>&nbsp;Logout</p>
         </div>
 
     } @else {

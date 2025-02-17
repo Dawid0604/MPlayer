@@ -29,12 +29,18 @@ class UserRestServiceImpl implements UserRestService {
     }
 
     @Override
+    public String getLoggedUserUsername() {
+        return getLoggedUser().map(UserDetails::getUsername)
+                              .orElseThrow();
+    }
+
+    @Override
     @Transactional
     public void register(final String username, final String password, final String nickname) {
         throwWhenUsernameExists(username);
         throwWhenNicknameExists(nickname);
         UserRoleEntity userRole = userRoleDaoService.findByName("USER")
-                                                    .orElseThrow(() -> ResourceNotFoundException.userRoleException("USER"));
+                                                    .orElseThrow(() -> ResourceNotFoundException.userRoleNotFoundException("USER"));
 
         UserEntity user = UserEntity.builder()
                                     .username(username)

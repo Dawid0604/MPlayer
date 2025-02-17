@@ -84,7 +84,7 @@ class SongRestServiceImpl implements SongRestService {
 
     private void throwWhenSongNotFound(final long songId) throws ResourceNotFoundException {
         if(!songDaoService.existsById(songId)) {
-            throw ResourceNotFoundException.songException(songId);
+            throw ResourceNotFoundException.songNotFoundException(songId);
         }
     }
 }

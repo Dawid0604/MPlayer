@@ -47,4 +47,8 @@ public class UserEntity extends EntityBase {
         this.role = role;
         this.username = username;
     }
+
+    public UserEntity(final long id) {
+        super(id);
+    }
 }

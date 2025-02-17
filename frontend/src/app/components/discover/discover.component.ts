@@ -50,7 +50,14 @@ export class DiscoverComponent implements OnInit {
     this.songService
         .discoverSongs(0, this.searchedText, this.selectedSongGenres, this.selectedSongMoods)
         .subscribe({
-          next: _res => this.discoveredSongs = _res,
+          next: _res => {
+            if(_res.songs.length > 0) {
+              this.discoveredSongs = _res;
+
+            } else {
+              this.toastrService.warning("Not found songs");
+            }
+          },
           error: _err => {
             if(_err['Message']) {
               this.toastrService.error(_err['Message'])
@@ -61,7 +68,14 @@ export class DiscoverComponent implements OnInit {
     this.songService
         .findGenres()
         .subscribe({
-          next: _res => this.songGenres = _res,
+          next: _res => {
+            if(_res.length > 0) {
+              this.songGenres = _res
+
+            } else {
+              this.toastrService.warning("Not found genres");
+            }
+          },
           error: _err => {
             if(_err['Message']) {
               this.toastrService.error(_err['Message'])
@@ -72,7 +86,14 @@ export class DiscoverComponent implements OnInit {
     this.songService
         .findMoods()
         .subscribe({
-          next: _res => this.songMoods = _res,
+          next: _res => {
+            if(_res.length > 0) {
+              this.songMoods = _res
+
+            } else {
+              this.toastrService.warning("Not found moods");
+            }
+          },
           error: _err => {
             if(_err['Message']) {
               this.toastrService.error(_err['Message'])
@@ -85,7 +106,14 @@ export class DiscoverComponent implements OnInit {
     this.songService
         .discoverSongs(pageNumber, this.searchedText, this.selectedSongGenres, this.selectedSongMoods)
         .subscribe({
-          next: _res => this.discoveredSongs = _res,
+          next: _res => {
+            if(_res.songs.length > 0) {
+              this.discoveredSongs = _res
+
+            } else {
+              this.toastrService.warning("Not found songs");
+            }
+          },
           error: _err => {
             if(_err['Message']) {
               this.toastrService.error(_err['Message'])
@@ -150,7 +178,14 @@ export class DiscoverComponent implements OnInit {
     this.songService
         .discoverSongs(this.discoveredSongs.pageable.pageNumber, this.searchedText, this.selectedSongGenres, this.selectedSongMoods)
         .subscribe({
-          next: _res => this.discoveredSongs = _res,
+          next: _res => {
+            if(_res.songs.length > 0) {
+              this.discoveredSongs = _res;
+
+            } else {
+              this.toastrService.warning("Not founs songs");
+            }
+          },
           error: _err => {
             if(_err['Message']) {
               this.toastrService.error(_err['Message'])

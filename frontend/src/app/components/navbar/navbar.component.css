@@ -12,3 +12,8 @@ nav {
     margin: 0.75em;
     cursor: pointer;
 }
+
+.nav-item:hover {
+    transition-duration: 500ms;    
+    color: rgb(175, 171, 171);
+}

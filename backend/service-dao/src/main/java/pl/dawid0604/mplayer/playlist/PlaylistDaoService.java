@@ -26,4 +26,10 @@ public interface PlaylistDaoService {
     boolean existsById(long playlistId);
 
     boolean playlistSongExistsById(long playlistId, long songId);
+
+    PlaylistEntity save(PlaylistEntity playlist);
+
+    boolean playlistNameExistsByUser(long userId, String playlistName);
+
+    int getNextUserPlaylistPosition(long userId);
 }

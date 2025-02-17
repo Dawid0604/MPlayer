@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { faCircleArrowUp, faCircleCheck, faCircleDown, faCirclePlay, faCircleStop, faCircleUp, faCircleXmark, faClock, faEyeSlash, faFloppyDisk, faMusic, faPenToSquare, faSquareCheck, faSquareXmark, faTrash, faVolumeHigh, faVolumeLow } from '@fortawesome/free-solid-svg-icons';
+import { faCircleArrowUp, faCircleCheck, faCircleDown, faCirclePlay, faCircleStop, faCircleUp, faCircleXmark, faClock, faEyeSlash, faFloppyDisk, faMusic, faPenToSquare, faPlusCircle, faSquareCheck, faSquareXmark, faTrash, faVolumeHigh, faVolumeLow } from '@fortawesome/free-solid-svg-icons';
 import { PlaylistService } from '../../services/playlist.service';
 import { PlaylistDTO } from '../../model/PlaylistDTO';
 import { PlaylistDetailsDTO } from '../../model/PlaylistDetailsDTO';
@@ -27,7 +27,9 @@ export class PlaylistComponent implements OnInit {
   editPlaylistIcon = faPenToSquare;
   savePlaylistIcon = faCircleCheck;
   cancelPlaylistIcon = faCircleXmark;
+  newPlaylistIcon = faPlusCircle;  
 
+  showCreatePlaylistBox = false;
   isPlaying = false;
   currentTime = 0;
   volume = 1;
@@ -41,6 +43,7 @@ export class PlaylistComponent implements OnInit {
   selectedPlaylistToEditIndex: number = 0;
   editPlaylistMode: boolean = false;
   form: any = { };
+  creatingPlaylistFormData = { name: '' };
 
   constructor(private playlistService: PlaylistService,
               private toastrService: ToastrService) { }
@@ -80,8 +83,15 @@ export class PlaylistComponent implements OnInit {
         .subscribe({
           next: _res => {
             this.playlistDetails = _res
-            this.currentSong = _res.songs[0];
             this.form.text = _res.playlist.name;
+
+            if(_res.songs.length === 0) {
+              this.currentSong = { } as SongDTO;
+
+            } else {
+              this.currentSong = _res.songs[0];
+            }
+            
           },
           error: _err => {
             if(_err['Message']) {
@@ -136,7 +146,11 @@ export class PlaylistComponent implements OnInit {
     
     this.form.text = playlist.name;
     this.selectedSongIndex = 0;
-    this.selectSong(this.selectedSongIndex, this.playlistDetails.songs[0], audioElement);
+    this.selectedSongIndex = this.selectedSongIndex;
+    this.currentSong = this.playlistDetails.songs[0];    
+    this.isPlaying = false;
+    this.currentTime = 0;   
+    audioElement.load();
   }
 
   increaseSongPosition(songId: string, songPosition: number) {
@@ -256,6 +270,23 @@ export class PlaylistComponent implements OnInit {
           next: _res => {
             this.reloadPlaylists();
             this.editPlaylistMode = false;
+          },
+          error: _err => {
+            if(_err['Message']) {
+              this.toastrService.error(_err['Message'])
+            }
+          }
+        })
+  }
+
+  createPlaylist() {
+    this.playlistService
+        .create(this.creatingPlaylistFormData.name)
+        .subscribe({
+          next: _res => {
+            this.reloadPlaylists();
+            this.creatingPlaylistFormData.name = '';
+            this.showCreatePlaylistBox = false;
           },
           error: _err => {
             if(_err['Message']) {

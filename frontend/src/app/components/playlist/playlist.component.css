@@ -128,12 +128,18 @@ button {
     overflow-y: auto;
 }
 
-#playlist_content header {
+.playlist_content header {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
 }
 
-.playlist_item {
+#playlist_controls_box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.playlist_item, #playlist_creating_box {
     width: 100%;
     height: 20%;
     display: flex;
@@ -141,6 +147,21 @@ button {
     justify-content: space-around;
     transition-duration: 500ms;
     cursor: pointer;
+}
+
+#playlist_creating_box {
+    cursor: default;
+    justify-content: center;
+    flex-direction: column;
+    height: 13%;    
+    padding: 0.5em;
+    box-sizing: border-box;
+}
+
+.form_warning {
+    color: rgb(244, 48, 48);
+    font-size: small;
+    margin: 0.1em;
 }
 
 .playlist_item:hover, .playlist_item_selected {

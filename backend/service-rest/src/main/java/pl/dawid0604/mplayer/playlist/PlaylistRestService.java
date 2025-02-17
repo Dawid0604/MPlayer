@@ -20,4 +20,6 @@ public interface PlaylistRestService {
     void deletePlaylist(String playlistId);
 
     void renamePlaylist(String playlistId, String name);
+
+    void createPlaylist(String name);
 }

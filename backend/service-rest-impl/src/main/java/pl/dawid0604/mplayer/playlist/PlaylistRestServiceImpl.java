@@ -2,17 +2,21 @@ package pl.dawid0604.mplayer.playlist;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.dawid0604.mplayer.encryption.EncryptionService;
 import pl.dawid0604.mplayer.exception.ResourceNotFoundException;
 import pl.dawid0604.mplayer.song.SongAuthorEntity;
 import pl.dawid0604.mplayer.song.SongDTO;
 import pl.dawid0604.mplayer.song.SongEntity;
+import pl.dawid0604.mplayer.user.UserDaoService;
+import pl.dawid0604.mplayer.user.UserEntity;
 import pl.dawid0604.mplayer.user.UserRestService;
 
 import java.util.Comparator;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static pl.dawid0604.mplayer.tools.DateFormatter.getCurrentDate;
 import static pl.dawid0604.mplayer.tools.DateFormatter.withDateFormat;
 
 @Service
@@ -20,6 +24,7 @@ import static pl.dawid0604.mplayer.tools.DateFormatter.withDateFormat;
 class PlaylistRestServiceImpl implements PlaylistRestService {
     private final PlaylistDaoService playlistDaoService;
     private final UserRestService userRestService;
+    private final UserDaoService userDaoService;
     private final EncryptionService encryptionService;
 
     @Override
@@ -84,15 +89,39 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
         playlistDaoService.renamePlaylist(playlistId, name);
     }
 
+    @Override
+    @Transactional
+    public void createPlaylist(final String name) {
+        var user = new UserEntity(userRestService.getLoggedUserId());
+        throwWhenUserHasPlaylistWithGivenName(name, userRestService.getLoggedUserId());
+
+        PlaylistEntity playlist = PlaylistEntity.builder()
+                                                .name(name)
+                                                .createdDate(getCurrentDate())
+                                                .user(user)
+                                                .position(playlistDaoService.getNextUserPlaylistPosition(user.getId()) + 1)
+                                                .build();
+
+        playlist = playlistDaoService.save(playlist);
+        playlist.setEncryptedId(encryptionService.encryptPlaylistId(playlist.getId()));
+        playlistDaoService.save(playlist);
+    }
+
     private void throwWhenPlaylistNotFound(final long playlistId) throws ResourceNotFoundException {
         if(!playlistDaoService.existsById(playlistId)) {
-            throw ResourceNotFoundException.playlistException(playlistId);
+            throw ResourceNotFoundException.playlistNotFoundException(playlistId);
         }
     }
 
     private void throwWhenSongNotFound(final long playlistId, final long songId) throws ResourceNotFoundException {
         if(!playlistDaoService.playlistSongExistsById(playlistId, songId)) {
-            throw ResourceNotFoundException.playlistSongException(playlistId, songId);
+            throw ResourceNotFoundException.playlistSongNotFoundException(playlistId, songId);
+        }
+    }
+
+    private void throwWhenUserHasPlaylistWithGivenName(final String playlistName, final long userId) throws ResourceNotFoundException {
+        if(playlistDaoService.playlistNameExistsByUser(userId, playlistName)) {
+            throw ResourceNotFoundException.userHasPlaylistWithGivenName(playlistName);
         }
     }
 

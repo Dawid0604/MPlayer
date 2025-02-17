@@ -2,6 +2,7 @@ package pl.dawid0604.mplayer.playlist;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import pl.dawid0604.mplayer.EntityBase;
 import pl.dawid0604.mplayer.user.UserEntity;
 
@@ -12,6 +13,7 @@ import static lombok.AccessLevel.PRIVATE;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Entity
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter(PRIVATE)

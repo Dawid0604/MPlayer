@@ -5,19 +5,23 @@ public class ResourceNotFoundException extends RuntimeException {
         super(message);
     }
 
-    public static ResourceNotFoundException playlistException(final long id) {
+    public static ResourceNotFoundException playlistNotFoundException(final long id) {
         return new ResourceNotFoundException("Playlist[Id=" + id + "] not found");
     }
 
-    public static ResourceNotFoundException songException(final long id) {
+    public static ResourceNotFoundException songNotFoundException(final long id) {
         return new ResourceNotFoundException("Song[Id=" + id + "] not found");
     }
 
-    public static ResourceNotFoundException playlistSongException(final long playlistId, final long songId) {
+    public static ResourceNotFoundException playlistSongNotFoundException(final long playlistId, final long songId) {
         return new ResourceNotFoundException("Pair[Playlist[Id=" + playlistId + "], Song[Id=" + songId + "]] not found");
     }
 
-    public static ResourceNotFoundException userRoleException(final String role) {
+    public static ResourceNotFoundException userRoleNotFoundException(final String role) {
         return new ResourceNotFoundException("UserRole[Role='" + role + "'] not found");
+    }
+
+    public static ResourceNotFoundException userHasPlaylistWithGivenName(final String playlistName) {
+        return new ResourceNotFoundException("User playlist[Name='" + playlistName + "'] already exists");
     }
 }
