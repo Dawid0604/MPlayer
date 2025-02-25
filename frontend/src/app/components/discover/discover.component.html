@@ -52,7 +52,7 @@
                 <div>{{song.releaseDate}}</div>
                 <div class="list_item_actions">
                     <fa-icon [icon]="playIcon"></fa-icon>&nbsp;
-                    <fa-icon [icon]="playlistIcon"></fa-icon>
+                    <fa-icon [icon]="playlistIcon" (click)="openPlaylistModal()"></fa-icon>
                 </div>                
             </article>
         </div>

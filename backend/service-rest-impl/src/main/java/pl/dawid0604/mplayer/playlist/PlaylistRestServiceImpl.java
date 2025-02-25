@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.dawid0604.mplayer.encryption.EncryptionService;
+import pl.dawid0604.mplayer.exception.ResourceExistException;
 import pl.dawid0604.mplayer.exception.ResourceNotFoundException;
 import pl.dawid0604.mplayer.song.SongAuthorEntity;
 import pl.dawid0604.mplayer.song.SongDTO;
+import pl.dawid0604.mplayer.song.SongDaoService;
 import pl.dawid0604.mplayer.song.SongEntity;
-import pl.dawid0604.mplayer.user.UserDaoService;
 import pl.dawid0604.mplayer.user.UserEntity;
 import pl.dawid0604.mplayer.user.UserRestService;
 
@@ -24,7 +25,7 @@ import static pl.dawid0604.mplayer.tools.DateFormatter.withDateFormat;
 class PlaylistRestServiceImpl implements PlaylistRestService {
     private final PlaylistDaoService playlistDaoService;
     private final UserRestService userRestService;
-    private final UserDaoService userDaoService;
+    private final SongDaoService songDaoService;
     private final EncryptionService encryptionService;
 
     @Override
@@ -56,7 +57,7 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
         long playlistId = encryptionService.decryptId(encryptedPlaylistId);
         long songId = encryptionService.decryptId(encryptedSongId);
 
-        throwWhenSongNotFound(playlistId, songId);
+        throwWhenPlaylistSongNotFound(playlistId, songId);
         playlistDaoService.deleteSong(playlistId, songId);
     }
 
@@ -107,21 +108,43 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
         playlistDaoService.save(playlist);
     }
 
+    @Override
+    public List<PlaylistWithSongDTO> findPlaylists(final String songId) {
+        return playlistDaoService.findUserPlaylists(userRestService.getLoggedUserId())
+                                 .stream()
+                                 .map(_playlist -> map(_playlist, songId))
+                                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void addSongToPlaylist(final String playlistId, final String songId) {
+        throwWhenSongNotFound(encryptionService.decryptId(songId));
+        throwWhenPlaylistNotFound(encryptionService.decryptId(playlistId));
+        playlistDaoService.addSongToPlaylist(encryptionService.decryptId(playlistId), encryptionService.decryptId(songId));
+    }
+
     private void throwWhenPlaylistNotFound(final long playlistId) throws ResourceNotFoundException {
         if(!playlistDaoService.existsById(playlistId)) {
             throw ResourceNotFoundException.playlistNotFoundException(playlistId);
         }
     }
 
-    private void throwWhenSongNotFound(final long playlistId, final long songId) throws ResourceNotFoundException {
+    private void throwWhenPlaylistSongNotFound(final long playlistId, final long songId) throws ResourceNotFoundException {
         if(!playlistDaoService.playlistSongExistsById(playlistId, songId)) {
             throw ResourceNotFoundException.playlistSongNotFoundException(playlistId, songId);
         }
     }
 
+    private void throwWhenSongNotFound(final long songId) throws ResourceNotFoundException {
+        if(!songDaoService.existsById(songId)) {
+            throw ResourceNotFoundException.songNotFoundException(songId);
+        }
+    }
+
     private void throwWhenUserHasPlaylistWithGivenName(final String playlistName, final long userId) throws ResourceNotFoundException {
         if(playlistDaoService.playlistNameExistsByUser(userId, playlistName)) {
-            throw ResourceNotFoundException.userHasPlaylistWithGivenName(playlistName);
+            throw ResourceExistException.userHasPlaylistWithGivenName(playlistName);
         }
     }
 
@@ -147,5 +170,10 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
 
         return new SongDTO(songEntity.getEncryptedId(), songEntity.getTitle(), authors,
                            songEntity.getThumbnailPath(), songEntity.getSoundLink());
+    }
+
+    private PlaylistWithSongDTO map(final PlaylistEntity playlist, final String songId) {
+        return new PlaylistWithSongDTO(playlist.getEncryptedId(), playlist.getName(), playlistDaoService.playlistSongExistsById(encryptionService.decryptId(playlist.getEncryptedId()),
+                                                                                                                                encryptionService.decryptId(songId)));
     }
 }

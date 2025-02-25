@@ -25,13 +25,7 @@ class UserRestServiceImpl implements UserRestService {
     @Override
     public long getLoggedUserId() {
         return getLoggedUser().flatMap(_username -> userDaoService.findIdByUsername(_username.getUsername()))
-                              .orElseThrow();
-    }
-
-    @Override
-    public String getLoggedUserUsername() {
-        return getLoggedUser().map(UserDetails::getUsername)
-                              .orElseThrow();
+                              .orElseThrow(ResourceNotFoundException::userException);
     }
 
     @Override
@@ -53,6 +47,25 @@ class UserRestServiceImpl implements UserRestService {
         user = userDaoService.save(user);
         user.setEncryptedId(encryptionService.encryptUserId(user.getId()));
         userDaoService.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void delete() {
+        userDaoService.deleteById(getLoggedUserId());
+    }
+
+    @Override
+    public UserDataDTO getLoggedUserData() {
+        return userDaoService.findUsernameRoleNicknameById(getLoggedUserId())
+                             .map(_user -> new UserDataDTO(_user.getUsername(), _user.getNickname(), _user.getRole().getName()))
+                             .orElseThrow(ResourceNotFoundException::userException);
+    }
+
+    @Override
+    @Transactional
+    public void updatePassword(final UserUpdatePasswordRequest request) {
+        userDaoService.updatePassword(getLoggedUserId(), passwordEncoder.encode(request.password()));
     }
 
     private void throwWhenUsernameExists(final String username) throws ResourceExistException {

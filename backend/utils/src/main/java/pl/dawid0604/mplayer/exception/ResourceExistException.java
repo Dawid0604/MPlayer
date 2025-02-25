@@ -12,4 +12,12 @@ public class ResourceExistException extends RuntimeException {
     public static ResourceExistException userNicknameException(final String nickname) {
         return new ResourceExistException("User[Nickname='" + nickname + "'] exists");
     }
+
+    public static ResourceExistException userHasPlaylistWithGivenName(final String playlistName) {
+        return new ResourceExistException("User playlist[Name='" + playlistName + "'] already exists");
+    }
+
+    public static ResourceExistException incomingPasswordIsSameAsOriginal() {
+        return new ResourceExistException("Incoming password is same as original");
+    }
 }

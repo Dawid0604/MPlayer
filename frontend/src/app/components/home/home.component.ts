@@ -3,6 +3,8 @@ import { faCirclePlay, faCircleStop, faClock, faEyeSlash, faVolumeHigh, faVolume
 import { SongService } from '../../services/song.service';
 import { SongDTO, WelcomeSongsDTO } from '../../model/WelcomeSongsDTO';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
+import { PlaylistModalComponent } from '../playlist-modal/playlist-modal.component';
 
 @Component({
   selector: 'app-home',
@@ -28,6 +30,7 @@ export class HomeComponent implements OnInit {
   currentSong : SongDTO = { } as SongDTO;
 
   constructor(private songService: SongService,
+              private dialog: MatDialog,
               private toastrService:ToastrService) { }
 
   ngOnInit(): void {
@@ -54,8 +57,7 @@ export class HomeComponent implements OnInit {
     this.currentSong = song;
     this.showPlayerBar = true;
     this.isPlaying = false;
-    this.currentTime = 0;
-    this.volume = 1;    
+    this.currentTime = 0;    
     audioElement.load();
   }
 
@@ -63,8 +65,7 @@ export class HomeComponent implements OnInit {
     this.currentSong = { } as SongDTO;
     this.showPlayerBar = false;
     this.isPlaying = false;
-    this.currentTime = 0;
-    this.volume = 1;
+    this.currentTime = 0;    
     
     audioElement.pause();    
     audioElement.currentTime = 0;
@@ -111,4 +112,12 @@ export class HomeComponent implements OnInit {
   adjustVolume(audioElement: HTMLAudioElement) {
     audioElement.volume = this.volume;
   }
+
+  openPlaylistModal() {
+    const dialogRef = this.dialog
+                          .open(PlaylistModalComponent);
+
+    dialogRef.afterClosed()
+             .subscribe(_result => { });
+  }  
 }

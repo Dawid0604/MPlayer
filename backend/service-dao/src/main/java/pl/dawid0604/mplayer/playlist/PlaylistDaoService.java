@@ -32,4 +32,6 @@ public interface PlaylistDaoService {
     boolean playlistNameExistsByUser(long userId, String playlistName);
 
     int getNextUserPlaylistPosition(long userId);
+
+    void addSongToPlaylist(long playlistId, long songId);
 }

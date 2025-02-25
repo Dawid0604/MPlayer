@@ -114,7 +114,7 @@ class PlaylistDaoServiceImpl implements PlaylistDaoService {
 
     @Override
     public boolean playlistSongExistsById(final long playlistId, final long songId) {
-        return playlistRepository.playlistSongExistsById(playlistId, songId);
+        return playlistRepository.playlistSongExistsById(playlistId, songId).isPresent();
     }
 
     @Override
@@ -132,6 +132,12 @@ class PlaylistDaoServiceImpl implements PlaylistDaoService {
     @Transactional
     public PlaylistEntity save(final PlaylistEntity playlist) {
         return playlistRepository.save(playlist);
+    }
+
+    @Override
+    @Transactional
+    public void addSongToPlaylist(final long playlistId, final long songId) {
+        playlistRepository.addSongToPlaylist(playlistId, songId, playlistRepository.findLastPlaylistSongPosition(playlistId));
     }
 
     private static PlaylistSongsLinksEntity map(final Object[] song) {

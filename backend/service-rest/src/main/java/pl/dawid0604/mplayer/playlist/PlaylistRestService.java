@@ -22,4 +22,8 @@ public interface PlaylistRestService {
     void renamePlaylist(String playlistId, String name);
 
     void createPlaylist(String name);
+
+    void addSongToPlaylist(String playlistId, String songId);
+
+    List<PlaylistWithSongDTO> findPlaylists(String songId);
 }

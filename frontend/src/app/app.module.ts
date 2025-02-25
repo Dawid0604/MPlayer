@@ -13,7 +13,14 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@a
 import { RequestInterceptor } from './interceptor/request.interceptor';
 import { CookieService } from 'ngx-cookie-service';
 import { WelcomeComponent } from './components/welcome/welcome.component';
-import { ToastrModule, ToastNoAnimation, ToastNoAnimationModule } from 'ngx-toastr';
+import { ToastNoAnimationModule } from 'ngx-toastr';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { MatDialogModule } from '@angular/material/dialog'
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { UserModalComponent } from './components/user/user-modal.component';
+import { PlaylistModalComponent } from './components/playlist-modal/playlist-modal.component'
 
 @NgModule({
   declarations: [
@@ -22,7 +29,9 @@ import { ToastrModule, ToastNoAnimation, ToastNoAnimationModule } from 'ngx-toas
     NavbarComponent,
     PlaylistComponent,
     DiscoverComponent,
-    WelcomeComponent
+    WelcomeComponent,
+    UserModalComponent,
+    PlaylistModalComponent
   ],
   imports: [
     BrowserModule,
@@ -32,12 +41,17 @@ import { ToastrModule, ToastNoAnimation, ToastNoAnimationModule } from 'ngx-toas
     ToastNoAnimationModule.forRoot({
       positionClass: 'toast-bottom-right',
       preventDuplicates: true
-    })
+    }),
+    MatDialogModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule
   ],
   providers: [
     CookieService,
     provideHttpClient(withInterceptorsFromDi()),
-    { provide: HTTP_INTERCEPTORS, useClass: RequestInterceptor, multi: true}
+    { provide: HTTP_INTERCEPTORS, useClass: RequestInterceptor, multi: true},
+    provideAnimationsAsync()
   ],
   bootstrap: [AppComponent]
 })

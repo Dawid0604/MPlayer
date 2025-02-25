@@ -12,4 +12,10 @@ public interface UserDaoService {
     boolean existsByNickname(String nickname);
 
     UserEntity save(UserEntity entity);
+
+    void deleteById(long loggedUserId);
+
+    Optional<UserEntity> findUsernameRoleNicknameById(long loggedUserId);
+
+    void updatePassword(long loggedUserId, String password);
 }

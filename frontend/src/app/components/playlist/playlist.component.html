@@ -4,7 +4,7 @@
             <source [src]="currentSong.soundLink" type="audio/mp3">    
         </audio>
 
-        <div class="player-controls" *ngIf="currentSong.soundLink">     
+        <div class="player-controls" *ngIf="currentSong && currentSong.soundLink">     
             <div class="player_group">
                 <div class="player_song_image" ></div>
                 <div>
@@ -51,7 +51,7 @@
     </article>
 
     <aside id="aside_box">
-        <section class="playlist_content">
+        <section id="playlist_content">
             <header>
                 <h3>Playlists</h3>
 
@@ -86,7 +86,7 @@
                         <input class="edit_playlist_input" [(ngModel)]="form.text" #text="ngModel" type="text" name="text">
                         
                         <div [ngClass]="(_pos === selectedPlaylistIndex) ? 'playlist_item_actions playlist_item_actions_selected' : 'playlist_item_actions'">
-                            <button (click)="editPlaylist(playlist, 0)">
+                            <button (click)="editPlaylistMode = !editPlaylistMode">
                                 <fa-icon [icon]="cancelPlaylistIcon"></fa-icon>
                             </button>
                         
@@ -120,17 +120,17 @@
             </div>
         </section>
 
-        <section class="playlist_content" *ngIf="playlistDetails.songs.length > 0">
+        <section id="playlist_songs_content" *ngIf="playlistDetails.songs && playlistDetails.songs.length > 0">
             <header>
                 <h3>Playlist songs</h3>
             </header>
 
-            <div class="playlist_item" *ngFor="let song of playlistDetails.songs; index as _pos" [ngClass]="(_pos === selectedSongIndex) ? 'playlist_item_selected' : ''">
+            <div class="playlist_song_item" *ngFor="let song of playlistDetails.songs; index as _pos" [ngClass]="(_pos === selectedSongIndex) ? 'playlist_song_item_selected' : ''">
                 <div (click)="selectSong(_pos, song, audioPlayer)">{{_pos + 1}}</div>
                 <div class="player_song_image" (click)="selectSong(_pos, song, audioPlayer)" [style]="{ 'background-image': 'url(' + song.thumbnailPath + ')'}"></div>
                 <div (click)="selectSong(_pos, song, audioPlayer)" class="song_title_box">{{song.title}}<p style="font-size: smaller;" *ngIf="song.authors">{{song.authors.join(', ')}}</p></div>
 
-                <div [ngClass]="_pos === selectedSongIndex ? 'playlist_item_actions playlist_item_actions_selected' : 'playlist_item_actions'">
+                <div [ngClass]="_pos === selectedSongIndex ? 'playlist_song_item_actions playlist_item_actions_selected' : 'playlist_song_item_actions'">
                     <button [disabled]="_pos === selectedSongIndex" (click)="deleteSong(song.encryptedId)">
                         <fa-icon [icon]="deletePlaylistIcon"></fa-icon>                    
                     </button>

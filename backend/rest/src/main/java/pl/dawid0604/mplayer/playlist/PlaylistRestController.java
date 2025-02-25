@@ -7,6 +7,7 @@ import pl.dawid0604.mplayer.playlist.request.PlaylistRenameRequestDTO;
 
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.http.HttpStatus.*;
 import static pl.dawid0604.mplayer.constants.AppConstants.API_PATH;
 
@@ -18,8 +19,9 @@ public class PlaylistRestController {
 
     @GetMapping
     @ResponseStatus(OK)
-    public List<PlaylistDTO> findUserPlaylists() {
-        return playlistRestService.findUserPlaylists();
+    public List<?> findUserPlaylists(@RequestParam(name = "song", required = false) final String songId) {
+        return (isBlank(songId)) ? playlistRestService.findUserPlaylists()
+                                 : playlistRestService.findPlaylists(songId);
     }
 
     @ResponseStatus(OK)
@@ -80,5 +82,13 @@ public class PlaylistRestController {
     @ResponseStatus(CREATED)
     public void createPlaylist(@RequestBody final PlaylistCreateRequestDTO request) {
         playlistRestService.createPlaylist(request.name());
+    }
+
+    @ResponseStatus(OK)
+    @PostMapping("/{playlistId}/{songId}/add")
+    public void addSongToPlaylist(@PathVariable("playlistId") final String playlistId,
+                                  @PathVariable("songId") final String songId) {
+
+        playlistRestService.addSongToPlaylist(playlistId, songId);
     }
 }

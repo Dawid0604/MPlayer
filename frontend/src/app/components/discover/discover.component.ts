@@ -6,6 +6,8 @@ import { SongService } from '../../services/song.service';
 import { SongMoodDTO } from '../../model/SongMoodDTO';
 import { SongGenreDTO } from '../../model/SongGenreDTO';
 import { ToastrService } from 'ngx-toastr';
+import { PlaylistModalComponent } from '../playlist-modal/playlist-modal.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-discover',
@@ -44,6 +46,7 @@ export class DiscoverComponent implements OnInit {
   form: any = { };
  
   constructor(private songService: SongService,
+              private dialog: MatDialog,
               private toastrService: ToastrService) { }
  
   ngOnInit(): void {
@@ -193,14 +196,6 @@ export class DiscoverComponent implements OnInit {
           }
         })
   }
-
-  showPlaylists() {
-
-  }
-
-  addSongToPlaylist(song: SongDTO, playlistId: string) {
-
-  }
  
   selectSong(song: SongDTO, audioElement: HTMLAudioElement) {    
     this.currentSong = song;
@@ -263,4 +258,12 @@ export class DiscoverComponent implements OnInit {
   adjustVolume(audioElement: HTMLAudioElement) {
     audioElement.volume = this.volume;
   }
+
+  openPlaylistModal() {
+    const dialogRef = this.dialog
+                          .open(PlaylistModalComponent, { data: { songId: this.currentSong.encryptedId } });
+
+    dialogRef.afterClosed()
+             .subscribe(_result => { });
+  }    
 }

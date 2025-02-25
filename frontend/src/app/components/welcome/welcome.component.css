@@ -78,9 +78,3 @@ section > form {
     border-color: #f8a025;
     background-color: #f8a025;
 }
-
-.form_warning {
-    color: rgb(244, 48, 48);
-    font-size: small;
-    margin: 0.1em;
-}

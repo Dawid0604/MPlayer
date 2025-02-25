@@ -247,7 +247,13 @@ export class PlaylistComponent implements OnInit {
         .subscribe({
           next: _res => {
             this.reloadPlaylists();
-            this.reloadPlaylistSongs();
+            
+            if(this.playlists.length > 0) {
+              this.selectedPlaylistIndex = 0;
+              this.getPlaylistDetails(this.playlists[0].encryptedId);
+            }
+
+            this.toastrService.info("Playlist has been deleted")
           },
           error: _err => {
             if(_err['Message']) {
@@ -270,6 +276,7 @@ export class PlaylistComponent implements OnInit {
           next: _res => {
             this.reloadPlaylists();
             this.editPlaylistMode = false;
+            this.toastrService.info("Playlist has been renamed");
           },
           error: _err => {
             if(_err['Message']) {
@@ -287,6 +294,7 @@ export class PlaylistComponent implements OnInit {
             this.reloadPlaylists();
             this.creatingPlaylistFormData.name = '';
             this.showCreatePlaylistBox = false;
+            this.toastrService.info("Playlist has been created")
           },
           error: _err => {
             if(_err['Message']) {

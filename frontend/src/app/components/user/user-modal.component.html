@@ -1,0 +1,27 @@
+<h2 mat-dialog-title>User settings</h2>
+
+<mat-dialog-content class="modal-container" *ngIf="loggedUserData">  
+    <div class="modal-section">
+      <h3>Password changing</h3>
+
+      <form #changingForm="ngForm" (ngSubmit)="updatePassword()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>New password</mat-label>
+          <input matInput [(ngModel)]="newPassword" type="password" name="password">
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="updatePassword()">Change</button>
+      </form>
+    </div>
+      
+    <div class="modal-section delete-section">
+      <h3>User deleting</h3>
+      <p>Account will be deleted pernamently</p>
+      <button mat-raised-button color="warn" (click)="deleteUser()">Delete</button>
+    </div>
+  
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="closeModal()">Close</button>
+</mat-dialog-actions>

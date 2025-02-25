@@ -1,0 +1,30 @@
+.modal-container {
+    display: flex;    
+    align-items: center;
+    flex-direction: column;    
+    max-height: 25em;
+    width: 25em;
+    overflow-y: auto;
+    margin-top: 2em;    
+}
+
+.playlist_item {
+    box-sizing: border-box;
+    margin: 1em;
+    padding: 0.5em;
+    background-color: #3584e4;
+    width: 80%;
+    text-align: center;
+    border-radius: 1em;
+    color: white;
+    transition-duration: 500ms;
+}
+
+.selected_playlist_item {
+    background-color: #51A351;
+}
+
+.playlist_item:hover {
+    cursor: pointer;
+    background-color: #5096ec;
+}

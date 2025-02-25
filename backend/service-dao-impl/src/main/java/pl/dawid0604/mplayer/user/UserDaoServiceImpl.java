@@ -38,4 +38,22 @@ class UserDaoServiceImpl implements UserDaoService {
     public UserEntity save(final UserEntity entity) {
         return userRepository.save(entity);
     }
+
+    @Override
+    @Transactional
+    public void deleteById(final long loggedUserId) {
+        userRepository.deleteByIdCustom(loggedUserId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<UserEntity> findUsernameRoleNicknameById(final long loggedUserId) {
+        return userRepository.findUsernameRoleNicknameById(loggedUserId);
+    }
+
+    @Override
+    @Transactional
+    public void updatePassword(final long loggedUserId, final String password) {
+        userRepository.updatePassword(loggedUserId, password);
+    }
 }

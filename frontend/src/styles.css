@@ -9,3 +9,13 @@ body {
 button {
     cursor: pointer;
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+.form_warning {
+    color: rgb(244, 48, 48);
+    font-size: small;
+    margin: 0.1em;
+}

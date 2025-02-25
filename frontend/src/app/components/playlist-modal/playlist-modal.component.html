@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>Add to playlist</h2>
+
+<mat-dialog-content class="modal-container">
+  <div class="playlist_item" *ngFor="let playlist of playlists"
+      [ngClass]="playlist.songIsPresent ? 'selected_playlist_item' : ''"
+      (click)="onClick(playlist)">
+
+    <p>{{playlist.name}}</p>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="closeModal()">Close</button>
+</mat-dialog-actions>

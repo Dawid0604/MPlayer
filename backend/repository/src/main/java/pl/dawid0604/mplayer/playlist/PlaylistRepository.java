@@ -115,12 +115,11 @@ public interface PlaylistRepository extends JpaRepository<PlaylistEntity, Long> 
 
     @Query(value = """
                 UPDATE Playlists as pl
-                SET psl.Position = pl.Position - 1
+                SET pl.Position = pl.Position - 1
                 WHERE pl.Id = :playlistId AND
                       pl.Position > :position
             """, nativeQuery = true)
     void correctPlaylistsPosition(long playlistId, int position);
-
 
     @Query(value = """
                 SELECT pl.Id, pl.Position
@@ -161,7 +160,7 @@ public interface PlaylistRepository extends JpaRepository<PlaylistEntity, Long> 
                 FROM PlaylistsSongsLinks pls
                 WHERE pls.PlaylistId = :playlistId AND pls.SongId = :songId
             """, nativeQuery = true)
-    boolean playlistSongExistsById(long playlistId, long songId);
+    Optional<Integer> playlistSongExistsById(long playlistId, long songId);
 
     @Query("""
             SELECT CASE WHEN COUNT(p) > 0 THEN TRUE ELSE FALSE END
@@ -177,4 +176,19 @@ public interface PlaylistRepository extends JpaRepository<PlaylistEntity, Long> 
             ORDER BY p.position DESC
            """)
     Optional<Integer> findLastPlaylistPosition(long userId);
+
+    @Query(value = """
+                SELECT IFNULL(MAX(pls.Position), 0)
+                FROM PlaylistsSongsLinks pls
+                WHERE pls.PlaylistId = :playlistId
+            """, nativeQuery = true)
+    int findLastPlaylistSongPosition(long playlistId);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            INSERT INTO PlaylistsSongsLinks (PlaylistId, SongId, Position)
+            VALUES (:playlistId, :songId, :position + 1)
+           """, nativeQuery = true)
+    void addSongToPlaylist(long playlistId, long songId, int position);
 }

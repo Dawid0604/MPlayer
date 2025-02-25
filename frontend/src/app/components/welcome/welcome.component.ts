@@ -36,6 +36,9 @@ export class WelcomeComponent {
           error: _err => {
             if(_err['Message']) {
               this.toastrService.warning(_err['Message'])
+
+            } else {
+              this.toastrService.warning("Wrong password or login, try again");
             }
           }
         })

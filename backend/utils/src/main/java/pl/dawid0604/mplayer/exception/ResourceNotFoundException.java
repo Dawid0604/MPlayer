@@ -21,7 +21,7 @@ public class ResourceNotFoundException extends RuntimeException {
         return new ResourceNotFoundException("UserRole[Role='" + role + "'] not found");
     }
 
-    public static ResourceNotFoundException userHasPlaylistWithGivenName(final String playlistName) {
-        return new ResourceNotFoundException("User playlist[Name='" + playlistName + "'] already exists");
+    public static ResourceNotFoundException userException() {
+        return new ResourceNotFoundException("Logged user not found");
     }
 }
