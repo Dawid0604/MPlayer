@@ -7,7 +7,7 @@ import java.util.List;
 public interface SongDaoService {
     List<SongEntity> findWelcomePopularSongs();
 
-    List<SongEntity> findWelcomeRecentSongsReleases();
+    List<SongEntity> findWelcomeRecentSongReleases();
 
     void handleSongListening(long songId);
 

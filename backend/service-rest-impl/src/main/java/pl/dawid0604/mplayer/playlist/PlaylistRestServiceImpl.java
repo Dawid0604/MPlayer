@@ -76,7 +76,7 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
         long playlistId = encryptionService.decryptId(encryptedId);
 
         throwWhenPlaylistNotFound(playlistId);
-        playlistDaoService.deletePlaylist(playlistId);
+        playlistDaoService.deletePlaylist(playlistId, userRestService.getLoggedUserId());
     }
 
     @Override
@@ -143,7 +143,7 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
     }
 
     private void throwWhenUserHasPlaylistWithGivenName(final String playlistName, final long userId) throws ResourceNotFoundException {
-        if(playlistDaoService.playlistNameExistsByUser(userId, playlistName)) {
+        if(playlistDaoService.playlistNameExistsByUserId(userId, playlistName)) {
             throw ResourceExistException.userHasPlaylistWithGivenName(playlistName);
         }
     }

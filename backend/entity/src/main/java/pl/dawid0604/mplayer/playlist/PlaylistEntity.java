@@ -55,4 +55,10 @@ public class PlaylistEntity extends EntityBase {
             this.songs = songs;
         }
     }
+
+    public void setUser(final UserEntity user) {
+        if(this.user == null) {
+            this.user = user;
+        }
+    }
 }

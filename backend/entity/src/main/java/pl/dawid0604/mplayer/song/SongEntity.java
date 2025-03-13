@@ -2,6 +2,7 @@ package pl.dawid0604.mplayer.song;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import pl.dawid0604.mplayer.EntityBase;
 
 import java.time.LocalDate;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @Entity
 @Getter @Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "Songs")

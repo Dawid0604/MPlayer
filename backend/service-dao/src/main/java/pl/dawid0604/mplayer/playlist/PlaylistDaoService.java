@@ -19,7 +19,7 @@ public interface PlaylistDaoService {
 
     void decreasePlaylistPosition(long playlistId);
 
-    void deletePlaylist(long playlistId);
+    void deletePlaylist(long playlistId, long userId);
 
     void renamePlaylist(long playlistId, String name);
 
@@ -29,7 +29,7 @@ public interface PlaylistDaoService {
 
     PlaylistEntity save(PlaylistEntity playlist);
 
-    boolean playlistNameExistsByUser(long userId, String playlistName);
+    boolean playlistNameExistsByUserId(long userId, String playlistName);
 
     int getNextUserPlaylistPosition(long userId);
 

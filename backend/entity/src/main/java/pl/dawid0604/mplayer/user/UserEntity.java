@@ -48,6 +48,14 @@ public class UserEntity extends EntityBase {
         this.username = username;
     }
 
+    public UserEntity(final String username, final String password, final String nickname,
+                      final UserRoleEntity role) {
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+        this.role = role;
+    }
+
     public UserEntity(final String username, final UserRoleEntity role,
                       final String nickname) {
 

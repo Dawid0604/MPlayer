@@ -5,13 +5,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import pl.dawid0604.mplayer.EntityBase;
 
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@SuperBuilder
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "SongMoods")

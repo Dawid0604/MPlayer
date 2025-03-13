@@ -24,7 +24,7 @@ class SongDaoServiceImpl implements SongDaoService {
     private final SongRepository songRepository;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     private static final String TRUE_EXPRESSION = "TRUE";
     private static final String AND_EXPRESSION = " AND ";
@@ -35,9 +35,9 @@ class SongDaoServiceImpl implements SongDaoService {
 
     private static final String DISCOVER_QUERY = """
                 SELECT s.EncryptedId, s.Title, s.ThumbnailPath, s.SoundLink, s.ReleaseDate,
-                       GROUP_CONCAT(DISTINCT sa.Name ORDER BY sa.Name ASC SEPARATOR ', ') AS Authors,
-                       GROUP_CONCAT(DISTINCT CONCAT(m.EncryptedId, ':', m.Name, ':', m.color) ORDER BY m.Name ASC SEPARATOR ', ') AS Moods,
-                       GROUP_CONCAT(DISTINCT CONCAT(g.EncryptedId, ':', g.Name, ':', g.color) ORDER BY g.Name ASC SEPARATOR ', ') AS Genres
+                       GROUP_CONCAT(DISTINCT sa.Name ORDER BY sa.Name ASC SEPARATOR ',') AS Authors,
+                       GROUP_CONCAT(DISTINCT CONCAT(m.EncryptedId, ':', m.Name, ':', m.color) ORDER BY m.Name ASC SEPARATOR ',') AS Moods,
+                       GROUP_CONCAT(DISTINCT CONCAT(g.EncryptedId, ':', g.Name, ':', g.color) ORDER BY g.Name ASC SEPARATOR ',') AS Genres
                 FROM Songs as s
                 INNER JOIN SongAuthorsLinks as asl ON asl.SongId = s.Id
                 INNER JOIN SongAuthors as sa ON asl.AuthorId = sa.Id
@@ -98,7 +98,7 @@ class SongDaoServiceImpl implements SongDaoService {
 
     private static final String WELCOME_POPULAR_SONGS = """
                 SELECT s.EncryptedId, s.Title, s.ThumbnailPath, s.SoundLink,
-                       GROUP_CONCAT(DISTINCT sa.Name ORDER BY sa.Name ASC SEPARATOR ', ') AS Authors
+                       GROUP_CONCAT(DISTINCT sa.Name ORDER BY sa.Name ASC SEPARATOR ',') AS Authors
                 FROM Songs as s
                 INNER JOIN SongAuthorsLinks as asl ON asl.SongId = s.Id
                 INNER JOIN SongAuthors as sa ON asl.AuthorId = sa.Id
@@ -109,7 +109,7 @@ class SongDaoServiceImpl implements SongDaoService {
 
     private static final String WELCOME_RECENT_SONGS = """
                 SELECT s.EncryptedId, s.Title, s.ThumbnailPath, s.SoundLink,
-                       GROUP_CONCAT(DISTINCT sa.Name ORDER BY sa.Name ASC SEPARATOR ', ') AS Authors
+                       GROUP_CONCAT(DISTINCT sa.Name ORDER BY sa.Name ASC SEPARATOR ',') AS Authors
                 FROM Songs as s
                 INNER JOIN SongAuthorsLinks as asl ON asl.SongId = s.Id
                 INNER JOIN SongAuthors as sa ON asl.AuthorId = sa.Id
@@ -130,7 +130,7 @@ class SongDaoServiceImpl implements SongDaoService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<SongEntity> findWelcomeRecentSongsReleases() {
+    public List<SongEntity> findWelcomeRecentSongReleases() {
         return ((List<Object[]>) entityManager.createNativeQuery(WELCOME_RECENT_SONGS)
                                               .getResultList())
                                               .stream()
@@ -140,7 +140,7 @@ class SongDaoServiceImpl implements SongDaoService {
 
     @Override
     public void handleSongListening(final long songId) {
-        songRepository.incrementNumberOfListening(songId);
+        songRepository.incrementNumberOfListens(songId);
     }
 
     @Override
@@ -178,7 +178,7 @@ class SongDaoServiceImpl implements SongDaoService {
         List<String> words = RegexTool.split(searchedText, SPACE_PATTERN);
         StringBuilder expressionBuilder = new StringBuilder();
 
-        for (String word : words) {
+        for (String word: words) {
             word = IGNORED_SEARCHED_TEXT_CHARACTERS_PATTERN.matcher(word)
                                                            .replaceAll(EMPTY);
 

@@ -19,7 +19,7 @@ class SongRestServiceImpl implements SongRestService {
                                          .map(SongRestServiceImpl::map)
                                          .toList();
 
-        var recentSongsReleases = songDaoService.findWelcomeRecentSongsReleases()
+        var recentSongsReleases = songDaoService.findWelcomeRecentSongReleases()
                                                 .stream()
                                                 .map(SongRestServiceImpl::map)
                                                 .toList();

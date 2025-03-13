@@ -93,12 +93,12 @@ class PlaylistDaoServiceImpl implements PlaylistDaoService {
 
     @Override
     @Transactional
-    public void deletePlaylist(final long playlistId) {
+    public void deletePlaylist(final long playlistId, final long userId) {
         var playlistPosition = playlistRepository.findPlaylistPosition(playlistId)
                                                  .orElseThrow();
 
         playlistRepository.deletePlaylist(playlistId);
-        playlistRepository.correctPlaylistsPosition(playlistId, playlistPosition);
+        playlistRepository.correctPlaylistsPosition(userId, playlistPosition);
     }
 
     @Override
@@ -118,8 +118,8 @@ class PlaylistDaoServiceImpl implements PlaylistDaoService {
     }
 
     @Override
-    public boolean playlistNameExistsByUser(final long userId, final String playlistName) {
-        return playlistRepository.playlistNameExistsByUser(userId, playlistName);
+    public boolean playlistNameExistsByUserId(final long userId, final String playlistName) {
+        return playlistRepository.playlistNameExistsByUserId(userId, playlistName);
     }
 
     @Override
@@ -137,7 +137,7 @@ class PlaylistDaoServiceImpl implements PlaylistDaoService {
     @Override
     @Transactional
     public void addSongToPlaylist(final long playlistId, final long songId) {
-        playlistRepository.addSongToPlaylist(playlistId, songId, playlistRepository.findLastPlaylistSongPosition(playlistId));
+        playlistRepository.savePlaylistSongPair(playlistId, songId);
     }
 
     private static PlaylistSongsLinksEntity map(final Object[] song) {
