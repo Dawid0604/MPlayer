@@ -1,4 +1,4 @@
-package pl.dawid0604.mplayer;
+package pl.dawid0604.mplayer.handler;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -12,8 +12,7 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
 public class RestControllerExceptionHandler {
@@ -23,13 +22,18 @@ public class RestControllerExceptionHandler {
         return new ResponseEntity<>(Map.of("Message", exception.getMessage()), INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler({ ResourceNotFoundException.class, ResourceExistException.class })
-    public ResponseEntity<?> handleResourceNotFoundException(final Exception exception) {
-        return new ResponseEntity<>(Map.of("Message", exception.getMessage()), BAD_REQUEST);
+    @ExceptionHandler({ ResourceNotFoundException.class })
+    public ResponseEntity<?> handleResourceException(final Exception exception) {
+        return new ResponseEntity<>(Map.of("Message", exception.getMessage()), NOT_FOUND);
+    }
+
+    @ExceptionHandler({ ResourceExistException.class })
+    public ResponseEntity<?> handleResourceExistException(final Exception exception) {
+        return new ResponseEntity<>(Map.of("Message", exception.getMessage()), CONFLICT);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationExceptions(final MethodArgumentNotValidException exception) {
+    public ResponseEntity<?> handleValidationException(final MethodArgumentNotValidException exception) {
         var body = exception.getBindingResult()
                             .getFieldErrors()
                             .stream()

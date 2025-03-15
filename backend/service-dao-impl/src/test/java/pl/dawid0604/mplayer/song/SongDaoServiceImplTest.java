@@ -50,7 +50,7 @@ class SongDaoServiceImplTest {
     private SongDaoService service;
 
     @SuppressWarnings("resource")
-    static MariaDBContainer<?> mariaDBContainer = new MariaDBContainer<>("mariadb:10.11.10-jammy")
+    static MariaDBContainer<?> mariaDBContainer = new MariaDBContainer<>("mariadb:latest")
                                                       .withDatabaseName("mplayer_db")
                                                       .withEnv("MYSQL_USER", "root")
                                                       .withEnv("MYSQL_ROOT_PASSWORD", "")

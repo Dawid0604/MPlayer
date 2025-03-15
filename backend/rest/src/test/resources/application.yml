@@ -1,0 +1,24 @@
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+  flyway:
+    schemas: mplayer_db
+
+custom:
+  security:
+    aes:
+      secretKey: =f7;Qd[622#9P+ZGIlDqw&sIKwK~P(QR
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG

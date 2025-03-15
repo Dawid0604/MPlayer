@@ -10,7 +10,7 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class SongGenreDaoServiceImplTest {
-    @Mock SongGenreRepository songGenreRepository;
+    @Mock private SongGenreRepository songGenreRepository;
     @InjectMocks private SongGenreDaoServiceImpl songGenreDaoService;
 
     @Test

@@ -1,5 +1,6 @@
 package pl.dawid0604.mplayer.playlist;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import pl.dawid0604.mplayer.playlist.request.PlaylistCreateRequestDTO;
@@ -74,17 +75,17 @@ public class PlaylistRestController {
 
     @PatchMapping("/rename")
     @ResponseStatus(NO_CONTENT)
-    public void renamePlaylist(@RequestBody final PlaylistRenameRequestDTO request) {
+    public void renamePlaylist(@RequestBody @Valid final PlaylistRenameRequestDTO request) {
         playlistRestService.renamePlaylist(request.encryptedId(), request.name());
     }
 
     @PostMapping("/create")
     @ResponseStatus(CREATED)
-    public void createPlaylist(@RequestBody final PlaylistCreateRequestDTO request) {
+    public void createPlaylist(@RequestBody @Valid final PlaylistCreateRequestDTO request) {
         playlistRestService.createPlaylist(request.name());
     }
 
-    @ResponseStatus(OK)
+    @ResponseStatus(NO_CONTENT)
     @PostMapping("/{playlistId}/{songId}/add")
     public void addSongToPlaylist(@PathVariable("playlistId") final String playlistId,
                                   @PathVariable("songId") final String songId) {

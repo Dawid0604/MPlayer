@@ -1,5 +1,6 @@
 package pl.dawid0604.mplayer.song;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class SongRestController {
 
     @ResponseStatus(OK)
     @PostMapping("/discover")
-    public DiscoverSongsDTO discover(@RequestBody final DiscoverPayload payload) {
+    public DiscoverSongsDTO discover(@RequestBody @Valid final DiscoverPayload payload) {
         return songRestService.discover(payload);
     }
 
