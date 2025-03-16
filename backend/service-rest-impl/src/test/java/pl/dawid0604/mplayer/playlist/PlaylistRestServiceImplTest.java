@@ -414,9 +414,6 @@ class PlaylistRestServiceImplTest {
         long firstPlaylistId = 2L;
         long secondPlaylistId = 3L;
 
-        long expectedFirstPlaylistNumberOfSongs = 2;
-        long expectedSecondPlaylistNumberOfSongs = 5;
-
         var foundPlaylists = List.of(
                 PlaylistEntity.builder()
                               .encryptedId("encryptedId#1")

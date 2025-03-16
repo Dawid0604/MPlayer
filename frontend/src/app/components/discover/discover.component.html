@@ -41,7 +41,7 @@
                 <div>Actions</div>                
             </article>            
 
-            <article *ngFor="let song of discoveredSongs.songs" class="list_item" (click)="selectSong(song, audioPlayer)" [ngClass]="song === currentSong ? 'list_item_selected' : ''">
+            <article *ngFor="let song of discoveredSongs.songs" class="list_item" (click)="selectSong(song, audioPlayer)" [ngClass]="song.encryptedId === currentSong.encryptedId ? 'list_item_selected' : ''">
                 <div [style]="{ 'background-image': 'url(' + song.thumbnailPath + ')'}"></div>
                 <div>{{song.title}} - {{song.authors.join(', ')}}</div>
                 <div class="song_colors">
@@ -52,7 +52,7 @@
                 <div>{{song.releaseDate}}</div>
                 <div class="list_item_actions">
                     <fa-icon [icon]="playIcon"></fa-icon>&nbsp;
-                    <fa-icon [icon]="playlistIcon" (click)="openPlaylistModal()"></fa-icon>
+                    <fa-icon [icon]="playlistIcon" (click)="openPlaylistModal(song.encryptedId)"></fa-icon>
                 </div>                
             </article>
         </div>

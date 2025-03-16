@@ -54,7 +54,10 @@ export class PlaylistComponent implements OnInit {
         .subscribe({
           next: _res => {
             this.playlists = _res;
-            this.getPlaylistDetails(_res[0].encryptedId)
+
+            if(_res[0]) {
+              this.getPlaylistDetails(_res[0].encryptedId)
+            }
           },
           error: _err => {
             if(_err['Message']) {
@@ -246,14 +249,30 @@ export class PlaylistComponent implements OnInit {
         .deletePlaylist(playlistId)
         .subscribe({
           next: _res => {
-            this.reloadPlaylists();
+            this.selectedPlaylistIndex = 0;
+            this.playlistService
+                .findPlaylists()
+                .subscribe({
+                  next: _res => {
+                    this.playlists = _res
             
-            if(this.playlists.length > 0) {
-              this.selectedPlaylistIndex = 0;
-              this.getPlaylistDetails(this.playlists[0].encryptedId);
-            }
-
-            this.toastrService.info("Playlist has been deleted")
+                    if(this.playlists && this.playlists.length >= 1) {              
+                      this.getPlaylistDetails(this.playlists[0].encryptedId);
+                    
+                    } else {              
+                      this.playlistDetails = { } as PlaylistDetailsDTO;
+                      this.currentSong = { } as SongDTO;
+                      this.currentTime = 0;
+                    }
+                  
+                    this.toastrService.info("Playlist has been deleted")
+                  },
+                  error: _err => {
+                    if(_err['Message']) {
+                      this.toastrService.error(_err['Message'])
+                    }
+                  }
+                })
           },
           error: _err => {
             if(_err['Message']) {

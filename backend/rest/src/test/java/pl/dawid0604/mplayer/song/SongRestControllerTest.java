@@ -88,9 +88,7 @@ class SongRestControllerTest {
 
     @ParameterizedTest
     @CsvSource(delimiter = ';', value = {
-            "x;1;2",
-            "x;-1;2",
-            "x;1;0",
+            ";-1;2",
             "searchedTest;-1;2",
             "searchedTest;1;0"
     })

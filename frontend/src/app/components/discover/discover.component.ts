@@ -259,9 +259,9 @@ export class DiscoverComponent implements OnInit {
     audioElement.volume = this.volume;
   }
 
-  openPlaylistModal() {
+  openPlaylistModal(songEncryptedId: string) {
     const dialogRef = this.dialog
-                          .open(PlaylistModalComponent, { data: { songId: this.currentSong.encryptedId } });
+                          .open(PlaylistModalComponent, { data: { songId: songEncryptedId } });
 
     dialogRef.afterClosed()
              .subscribe(_result => { });

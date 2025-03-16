@@ -32,6 +32,7 @@ class SongDaoServiceImpl implements SongDaoService {
     private static final String SINGLE_QUOTE = "'";
     private static final String AGAINST_MATCH_EXPRESSION = "MATCH (%s) AGAINST ('*%s*' IN BOOLEAN MODE)";
     private static final Pattern IGNORED_SEARCHED_TEXT_CHARACTERS_PATTERN = Pattern.compile("[<>()~*+\\-'\"]");
+    private static final int SEARCHED_TEXT_MIN_LENGTH = 3;
 
     private static final String DISCOVER_QUERY = """
                 SELECT s.EncryptedId, s.Title, s.ThumbnailPath, s.SoundLink, s.ReleaseDate,
@@ -171,7 +172,7 @@ class SongDaoServiceImpl implements SongDaoService {
     }
 
     private static String getSearchedTextExpression(final String searchedText) {
-        if(isBlank(searchedText)) {
+        if(searchedTextIsNotValid(searchedText)) {
             return TRUE_EXPRESSION;
         }
 
@@ -197,6 +198,10 @@ class SongDaoServiceImpl implements SongDaoService {
 
         return expressionBuilder.isEmpty() ? TRUE_EXPRESSION
                                            : expressionBuilder.toString();
+    }
+
+    private static boolean searchedTextIsNotValid(final String searchedText) {
+        return length(searchedText) < SEARCHED_TEXT_MIN_LENGTH;
     }
 
     private static String toString(final List<String> list) {
