@@ -245,7 +245,7 @@ class PlaylistDaoServiceImplTest {
 
         // When
         // Then
-        playlistDaoService.getNextUserPlaylistPosition(userId);
+        playlistDaoService.getLastUserPlaylistPosition(userId);
         verify(playlistRepository).findLastPlaylistPosition(eq(userId));
     }
 

@@ -5,5 +5,4 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-class SongAuthorRestServiceImpl implements SongAuthorRestService {
-}
+class SongAuthorRestServiceImpl implements SongAuthorRestService { }

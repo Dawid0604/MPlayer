@@ -16,9 +16,4 @@ public interface SongAuthorRepository extends JpaRepository<SongAuthorEntity, Lo
                 VALUES (:songId, :authorId)
             """, nativeQuery = true)
     void saveSongAuthorPair(long authorId, long songId);
-
-    @Modifying
-    @Transactional
-    @Query(value = "DELETE FROM SongAuthorsLinks", nativeQuery = true)
-    void deleteFromLinksTable();
 }

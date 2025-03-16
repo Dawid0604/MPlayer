@@ -30,7 +30,7 @@ class SongRestServiceImpl implements SongRestService {
     @Override
     public void handleSongListening(final String encryptedId) {
         long songId = encryptionService.decryptId(encryptedId);
-        throwWhenSongNotFound(songId);
+        throwWhenSongNotExists(songId);
         songDaoService.handleSongListening(songId);
     }
 
@@ -82,7 +82,7 @@ class SongRestServiceImpl implements SongRestService {
                                          songEntity.getSoundLink());
     }
 
-    private void throwWhenSongNotFound(final long songId) throws ResourceNotFoundException {
+    private void throwWhenSongNotExists(final long songId) throws ResourceNotFoundException {
         if(!songDaoService.existsById(songId)) {
             throw ResourceNotFoundException.songNotFoundException(songId);
         }

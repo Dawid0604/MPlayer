@@ -3,6 +3,7 @@ package pl.dawid0604.mplayer.playlist;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.dawid0604.mplayer.exception.ResourceNotFoundException;
 import pl.dawid0604.mplayer.song.SongAuthorEntity;
 import pl.dawid0604.mplayer.song.SongEntity;
 import pl.dawid0604.mplayer.tools.RegexTool;
@@ -27,7 +28,7 @@ class PlaylistDaoServiceImpl implements PlaylistDaoService {
     @Transactional(readOnly = true)
     public PlaylistEntity getDetailsById(final long playlistId) {
         var playlist = playlistRepository.findDetailsById(playlistId)
-                                         .orElseThrow();
+                                         .orElseThrow(() -> ResourceNotFoundException.playlistNotFoundException(playlistId));
 
         var songs = playlistRepository.findPlaylistSongs(playlistId)
                                       .stream()
@@ -123,7 +124,7 @@ class PlaylistDaoServiceImpl implements PlaylistDaoService {
     }
 
     @Override
-    public int getNextUserPlaylistPosition(final long userId) {
+    public int getLastUserPlaylistPosition(final long userId) {
         return playlistRepository.findLastPlaylistPosition(userId)
                                  .orElse(0);
     }

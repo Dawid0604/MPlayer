@@ -25,9 +25,4 @@ public interface SongGenreRepository extends JpaRepository<SongGenreEntity, Long
                 VALUES (:songId, :genreId)
             """, nativeQuery = true)
     void saveSongGenrePair(long genreId, long songId);
-
-    @Modifying
-    @Transactional
-    @Query(value = "DELETE FROM SongGenresLinks", nativeQuery = true)
-    void deleteFromLinksTable();
 }

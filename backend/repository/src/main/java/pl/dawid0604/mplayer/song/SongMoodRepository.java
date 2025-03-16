@@ -25,9 +25,4 @@ public interface SongMoodRepository extends JpaRepository<SongMoodEntity, Long> 
                 VALUES (:songId, :moodId)
             """, nativeQuery = true)
     void saveSongMoodPair(long moodId, long songId);
-
-    @Modifying
-    @Transactional
-    @Query(value = "DELETE FROM SongMoodsLinks", nativeQuery = true)
-    void deleteFromLinksTable();
 }

@@ -21,6 +21,7 @@ class UserRestServiceImpl implements UserRestService {
     private final UserRoleDaoService userRoleDaoService;
     private final PasswordEncoder passwordEncoder;
     private final EncryptionService encryptionService;
+    private static final String USER_ROLE = "USER";
 
     @Override
     public long getLoggedUserId() {
@@ -33,8 +34,8 @@ class UserRestServiceImpl implements UserRestService {
     public void register(final String username, final String password, final String nickname) {
         throwWhenUsernameExists(username);
         throwWhenNicknameExists(nickname);
-        UserRoleEntity userRole = userRoleDaoService.findByName("USER")
-                                                    .orElseThrow(() -> ResourceNotFoundException.userRoleNotFoundException("USER"));
+        UserRoleEntity userRole = userRoleDaoService.findByName(USER_ROLE)
+                                                    .orElseThrow(() -> ResourceNotFoundException.userRoleNotFoundException(USER_ROLE));
 
         UserEntity user = UserEntity.builder()
                                     .username(username)

@@ -8,7 +8,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PRIVATE;
 
 @Getter
 @SuperBuilder
@@ -18,7 +17,6 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor
 public abstract class EntityBase {
     @Id
-    @Setter(PRIVATE)
     @Column(name = "Id")
     @GeneratedValue(strategy = IDENTITY)
     protected Long id;
@@ -33,5 +31,11 @@ public abstract class EntityBase {
 
     public EntityBase(final long id) {
         this.id = id;
+    }
+
+    public void setId(final long id) {
+        if(this.id == null) {
+            this.id = id;
+        }
     }
 }

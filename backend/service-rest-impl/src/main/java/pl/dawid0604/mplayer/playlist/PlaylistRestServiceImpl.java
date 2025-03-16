@@ -16,7 +16,6 @@ import pl.dawid0604.mplayer.user.UserRestService;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static pl.dawid0604.mplayer.tools.DateFormatter.getCurrentDate;
 import static pl.dawid0604.mplayer.tools.DateFormatter.withDateFormat;
 
@@ -57,7 +56,7 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
         long playlistId = encryptionService.decryptId(encryptedPlaylistId);
         long songId = encryptionService.decryptId(encryptedSongId);
 
-        throwWhenPlaylistSongNotFound(playlistId, songId);
+        throwWhenPlaylistSongNotExists(playlistId, songId);
         playlistDaoService.deleteSong(playlistId, songId);
     }
 
@@ -75,18 +74,14 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
     public void deletePlaylist(final String encryptedId) throws ResourceNotFoundException {
         long playlistId = encryptionService.decryptId(encryptedId);
 
-        throwWhenPlaylistNotFound(playlistId);
+        throwWhenPlaylistNotExists(playlistId);
         playlistDaoService.deletePlaylist(playlistId, userRestService.getLoggedUserId());
     }
 
     @Override
     public void renamePlaylist(final String encryptedId, final String name) throws ResourceNotFoundException {
-        if(isBlank(name)) {
-            throw new IllegalArgumentException("Playlist Name cannot be blank");
-        }
-
         long playlistId = encryptionService.decryptId(encryptedId);
-        throwWhenPlaylistNotFound(playlistId);
+        throwWhenPlaylistNotExists(playlistId);
         playlistDaoService.renamePlaylist(playlistId, name);
     }
 
@@ -100,7 +95,7 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
                                                 .name(name)
                                                 .createdDate(getCurrentDate())
                                                 .user(user)
-                                                .position(playlistDaoService.getNextUserPlaylistPosition(user.getId()) + 1)
+                                                .position(playlistDaoService.getLastUserPlaylistPosition(user.getId()) + 1)
                                                 .build();
 
         playlist = playlistDaoService.save(playlist);
@@ -119,24 +114,24 @@ class PlaylistRestServiceImpl implements PlaylistRestService {
     @Override
     @Transactional
     public void addSongToPlaylist(final String playlistId, final String songId) {
-        throwWhenSongNotFound(encryptionService.decryptId(songId));
-        throwWhenPlaylistNotFound(encryptionService.decryptId(playlistId));
+        throwWhenSongNotExists(encryptionService.decryptId(songId));
+        throwWhenPlaylistNotExists(encryptionService.decryptId(playlistId));
         playlistDaoService.addSongToPlaylist(encryptionService.decryptId(playlistId), encryptionService.decryptId(songId));
     }
 
-    private void throwWhenPlaylistNotFound(final long playlistId) throws ResourceNotFoundException {
+    private void throwWhenPlaylistNotExists(final long playlistId) throws ResourceNotFoundException {
         if(!playlistDaoService.existsById(playlistId)) {
             throw ResourceNotFoundException.playlistNotFoundException(playlistId);
         }
     }
 
-    private void throwWhenPlaylistSongNotFound(final long playlistId, final long songId) throws ResourceNotFoundException {
+    private void throwWhenPlaylistSongNotExists(final long playlistId, final long songId) throws ResourceNotFoundException {
         if(!playlistDaoService.playlistSongExistsById(playlistId, songId)) {
             throw ResourceNotFoundException.playlistSongNotFoundException(playlistId, songId);
         }
     }
 
-    private void throwWhenSongNotFound(final long songId) throws ResourceNotFoundException {
+    private void throwWhenSongNotExists(final long songId) throws ResourceNotFoundException {
         if(!songDaoService.existsById(songId)) {
             throw ResourceNotFoundException.songNotFoundException(songId);
         }

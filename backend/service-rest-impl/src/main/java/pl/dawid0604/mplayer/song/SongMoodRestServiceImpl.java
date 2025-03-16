@@ -2,7 +2,6 @@ package pl.dawid0604.mplayer.song;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.dawid0604.mplayer.encryption.EncryptionService;
 
 import java.util.List;
 
@@ -10,7 +9,6 @@ import java.util.List;
 @RequiredArgsConstructor
 class SongMoodRestServiceImpl implements SongMoodRestService {
     private final SongMoodDaoService songMoodDaoService;
-    private final EncryptionService encryptionService;
 
     @Override
     public List<SongMoodDTO> findAll() {
